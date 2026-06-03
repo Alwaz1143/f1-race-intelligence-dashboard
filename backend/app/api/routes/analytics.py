@@ -1,3 +1,4 @@
+from statistics import mean, median, pstdev
 from collections import Counter
 from fastapi import APIRouter, Query
 
@@ -14,7 +15,60 @@ def format_lap_time(seconds: float | None):
     remaining_seconds = seconds - (minutes * 60)
 
     return f"{minutes}:{remaining_seconds:06.3f}"
+# -----------------------------
+def calculate_consistency_score(std_dev: float | None):
+    if std_dev is None:
+        return None
 
+    score = max(0, 100 - (std_dev * 10))
+    return round(score, 2)
+
+
+def calculate_driver_lap_stats(driver_laps: list[dict]):
+    valid_laps = [
+        lap for lap in driver_laps
+        if lap.get("lap_duration") is not None
+    ]
+
+    if not valid_laps:
+        return {
+            "valid_lap_count": 0,
+            "fastest_lap": None,
+            "average_lap": None,
+            "median_lap": None,
+            "standard_deviation": None,
+            "consistency_score": None,
+        }
+
+    lap_durations = [
+        lap.get("lap_duration")
+        for lap in valid_laps
+    ]
+
+    fastest_lap_data = min(
+        valid_laps,
+        key=lambda lap: lap.get("lap_duration")
+    )
+
+    std_dev = pstdev(lap_durations) if len(lap_durations) > 1 else 0
+
+    return {
+        "valid_lap_count": len(valid_laps),
+        "fastest_lap": {
+            "lap_number": fastest_lap_data.get("lap_number"),
+            "lap_duration": fastest_lap_data.get("lap_duration"),
+            "lap_time_formatted": format_lap_time(
+                fastest_lap_data.get("lap_duration")
+            ),
+        },
+        "average_lap": round(mean(lap_durations), 3),
+        "average_lap_formatted": format_lap_time(mean(lap_durations)),
+        "median_lap": round(median(lap_durations), 3),
+        "median_lap_formatted": format_lap_time(median(lap_durations)),
+        "standard_deviation": round(std_dev, 3),
+        "consistency_score": calculate_consistency_score(std_dev),
+    }
+# --------------------------------------------
 
 @router.get("/analytics/session-overview")
 async def get_session_overview(
@@ -114,4 +168,228 @@ async def get_session_overview(
             "by_category": dict(category_counts),
             "by_flag": dict(flag_counts),
         }
+    }
+# --------------------------------
+
+@router.get("/analytics/fastest-laps")
+async def get_fastest_laps(
+    session_key: int = Query(..., description="OpenF1 session key")
+):
+    laps = await openf1_client.get(
+        "laps",
+        params={"session_key": session_key}
+    )
+
+    drivers = await openf1_client.get(
+        "drivers",
+        params={"session_key": session_key}
+    )
+
+    driver_map = {}
+
+    for driver in drivers:
+        driver_number = driver.get("driver_number")
+
+        if driver_number is not None:
+            driver_map[driver_number] = {
+                "driver_number": driver_number,
+                "full_name": driver.get("full_name"),
+                "name_acronym": driver.get("name_acronym"),
+                "team_name": driver.get("team_name"),
+                "team_colour": driver.get("team_colour"),
+                "country_code": driver.get("country_code"),
+            }
+
+    valid_laps = [
+        lap for lap in laps
+        if lap.get("lap_duration") is not None
+    ]
+
+    fastest_by_driver = {}
+
+    for lap in valid_laps:
+        driver_number = lap.get("driver_number")
+        lap_duration = lap.get("lap_duration")
+
+        if driver_number is None or lap_duration is None:
+            continue
+
+        if driver_number not in fastest_by_driver:
+            fastest_by_driver[driver_number] = lap
+        else:
+            current_fastest = fastest_by_driver[driver_number]
+
+            if lap_duration < current_fastest.get("lap_duration"):
+                fastest_by_driver[driver_number] = lap
+
+    leaderboard = []
+
+    for driver_number, lap in fastest_by_driver.items():
+        driver_info = driver_map.get(driver_number, {})
+
+        leaderboard.append({
+            "position": None,
+            "driver_number": driver_number,
+            "full_name": driver_info.get("full_name"),
+            "name_acronym": driver_info.get("name_acronym"),
+            "team_name": driver_info.get("team_name"),
+            "team_colour": driver_info.get("team_colour"),
+            "country_code": driver_info.get("country_code"),
+
+            "lap_number": lap.get("lap_number"),
+            "lap_duration": lap.get("lap_duration"),
+            "lap_time_formatted": format_lap_time(lap.get("lap_duration")),
+            "duration_sector_1": lap.get("duration_sector_1"),
+            "duration_sector_2": lap.get("duration_sector_2"),
+            "duration_sector_3": lap.get("duration_sector_3"),
+            "date_start": lap.get("date_start"),
+        })
+
+    leaderboard.sort(key=lambda item: item.get("lap_duration") or 999999)
+
+    for index, item in enumerate(leaderboard, start=1):
+        item["position"] = index
+
+    if not leaderboard:
+        return {
+            "session_key": session_key,
+            "count": 0,
+            "leaderboard": [],
+            "message": "No valid lap data found for this session."
+        }
+
+    return {
+        "session_key": session_key,
+        "count": len(leaderboard),
+        "leaderboard": leaderboard
+    }
+
+# ------------------------------
+
+@router.get("/analytics/compare-drivers")
+async def compare_drivers(
+    session_key: int = Query(..., description="OpenF1 session key"),
+    driver1: int = Query(..., description="First driver number"),
+    driver2: int = Query(..., description="Second driver number")
+):
+    laps = await openf1_client.get(
+        "laps",
+        params={"session_key": session_key}
+    )
+
+    drivers = await openf1_client.get(
+        "drivers",
+        params={"session_key": session_key}
+    )
+
+    driver_map = {}
+
+    for driver in drivers:
+        driver_number = driver.get("driver_number")
+
+        if driver_number is not None:
+            driver_map[driver_number] = {
+                "driver_number": driver_number,
+                "full_name": driver.get("full_name"),
+                "name_acronym": driver.get("name_acronym"),
+                "team_name": driver.get("team_name"),
+                "team_colour": driver.get("team_colour"),
+                "country_code": driver.get("country_code"),
+            }
+
+    driver1_laps = [
+        lap for lap in laps
+        if lap.get("driver_number") == driver1
+        and lap.get("lap_duration") is not None
+    ]
+
+    driver2_laps = [
+        lap for lap in laps
+        if lap.get("driver_number") == driver2
+        and lap.get("lap_duration") is not None
+    ]
+
+    driver1_laps.sort(key=lambda lap: lap.get("lap_number") or 999)
+    driver2_laps.sort(key=lambda lap: lap.get("lap_number") or 999)
+
+    driver1_stats = calculate_driver_lap_stats(driver1_laps)
+    driver2_stats = calculate_driver_lap_stats(driver2_laps)
+
+    driver1_lap_map = {
+        lap.get("lap_number"): lap
+        for lap in driver1_laps
+        if lap.get("lap_number") is not None
+    }
+
+    driver2_lap_map = {
+        lap.get("lap_number"): lap
+        for lap in driver2_laps
+        if lap.get("lap_number") is not None
+    }
+
+    common_lap_numbers = sorted(
+        set(driver1_lap_map.keys()) & set(driver2_lap_map.keys())
+    )
+
+    lap_by_lap_comparison = []
+
+    for lap_number in common_lap_numbers:
+        d1_lap = driver1_lap_map[lap_number]
+        d2_lap = driver2_lap_map[lap_number]
+
+        d1_time = d1_lap.get("lap_duration")
+        d2_time = d2_lap.get("lap_duration")
+
+        difference = round(d1_time - d2_time, 3)
+
+        lap_by_lap_comparison.append({
+            "lap_number": lap_number,
+            "driver1_lap_duration": d1_time,
+            "driver1_lap_time_formatted": format_lap_time(d1_time),
+            "driver2_lap_duration": d2_time,
+            "driver2_lap_time_formatted": format_lap_time(d2_time),
+            "difference": difference,
+            "faster_driver": driver1 if difference < 0 else driver2 if difference > 0 else "equal"
+        })
+
+    fastest_lap_difference = None
+    average_lap_difference = None
+    median_lap_difference = None
+
+    if driver1_stats["fastest_lap"] and driver2_stats["fastest_lap"]:
+        fastest_lap_difference = round(
+            driver1_stats["fastest_lap"]["lap_duration"]
+            - driver2_stats["fastest_lap"]["lap_duration"],
+            3
+        )
+
+    if driver1_stats["average_lap"] is not None and driver2_stats["average_lap"] is not None:
+        average_lap_difference = round(
+            driver1_stats["average_lap"] - driver2_stats["average_lap"],
+            3
+        )
+
+    if driver1_stats["median_lap"] is not None and driver2_stats["median_lap"] is not None:
+        median_lap_difference = round(
+            driver1_stats["median_lap"] - driver2_stats["median_lap"],
+            3
+        )
+
+    return {
+        "session_key": session_key,
+        "drivers": {
+            "driver1": driver_map.get(driver1, {"driver_number": driver1}),
+            "driver2": driver_map.get(driver2, {"driver_number": driver2}),
+        },
+        "stats": {
+            "driver1": driver1_stats,
+            "driver2": driver2_stats,
+        },
+        "differences": {
+            "fastest_lap_difference": fastest_lap_difference,
+            "average_lap_difference": average_lap_difference,
+            "median_lap_difference": median_lap_difference,
+            "note": "Negative value means driver1 was faster. Positive value means driver2 was faster."
+        },
+        "lap_by_lap_comparison": lap_by_lap_comparison
     }

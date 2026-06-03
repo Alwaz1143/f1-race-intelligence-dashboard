@@ -59,6 +59,8 @@ uvicorn app.main:app --reload --app-dir backend
 - Laps endpoint
 - Race control messages endpoint
 - Session overview analytics endpoint
+- Fastest laps leaderboard endpoint
+- Driver comparison analytics endpoint
 
 ## Current Backend Endpoints
 
@@ -69,6 +71,8 @@ uvicorn app.main:app --reload --app-dir backend
 - GET /api/laps?session_key=1234&driver_number=1
 - GET /api/race-control?session_key=1234
 - GET /api/analytics/session-overview?session_key=1234
+- GET /api/analytics/fastest-laps?session_key=1234
+- GET /api/analytics/compare-drivers?session_key=1234&driver1=1&driver2=4
 
 ## Project Status
 
