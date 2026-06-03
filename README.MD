@@ -61,6 +61,7 @@ uvicorn app.main:app --reload --app-dir backend
 - Session overview analytics endpoint
 - Fastest laps leaderboard endpoint
 - Driver comparison analytics endpoint
+- Refactored reusable time and statistics utilities
 
 ## Current Backend Endpoints
 
@@ -75,5 +76,5 @@ uvicorn app.main:app --reload --app-dir backend
 - GET /api/analytics/compare-drivers?session_key=1234&driver1=1&driver2=4
 
 ## Project Status
-
-This project is under active development.
+>[!Note]
+>This project is under active development.
