@@ -1,5 +1,5 @@
 from fastapi import FastAPI 
-from app.api.routes import health, races, sessions, drivers, laps
+from app.api.routes import health, races, sessions, drivers, laps, race_control, analytics
 
 
 app = FastAPI(
@@ -11,3 +11,5 @@ app.include_router(races.router, prefix = "/api")
 app.include_router(sessions.router, prefix = "/api")
 app.include_router(drivers.router, prefix = "/api")
 app.include_router(laps.router, prefix = "/api")
+app.include_router(race_control.router, prefix = "/api")
+app.include_router(analytics.router, prefix = "/api")

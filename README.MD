@@ -54,13 +54,22 @@ uvicorn app.main:app --reload --app-dir backend
 - Health check endpoint
 - OpenF1 API client
 - Race meetings endpoint
+- Sessions endpoint
+- Drivers endpoint
+- Laps endpoint
+- Race control messages endpoint
+- Session overview analytics endpoint
 
-### Current Backend Endpoints
+## Current Backend Endpoints
 
-```http
-GET /api/health
-GET /api/races?year=2024
+- GET /api/health
+- GET /api/races?year=2024
+- GET /api/sessions?meeting_key=1234
+- GET /api/drivers?session_key=1234
+- GET /api/laps?session_key=1234&driver_number=1
+- GET /api/race-control?session_key=1234
+- GET /api/analytics/session-overview?session_key=1234
 
 ## Project Status
 
-==This project is under active development.==
+This project is under active development.
