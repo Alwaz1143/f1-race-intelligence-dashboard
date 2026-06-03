@@ -17,6 +17,20 @@ The app will allow users to select a season, Grand Prix, and session, then view 
 - HTTPX
 - python-dotenv
 
+### Run the backend
+
+From the `backend` directory:
+
+```bash
+uvicorn app.main:app --reload
+```
+
+From the repo root:
+
+```bash
+uvicorn app.main:app --reload --app-dir backend
+```
+
 ### Frontend
 - React
 - Vite
