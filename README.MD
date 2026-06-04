@@ -80,6 +80,12 @@ uvicorn app.main:app --reload --app-dir backend
 - Added CORS support for React frontend integration
 - Improved API metadata and Swagger route grouping
 - Added root API information endpoint
+- Initialized React frontend with Vite
+- Added Tailwind CSS setup
+- Added React Router
+- Added TanStack Query provider
+- Added Axios API client
+- Created Home and Dashboard starter pages
 
 ## Current Backend Endpoints
 

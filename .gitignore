@@ -14,6 +14,9 @@ venv/
 .env.*
 !.env.example
 !backend/.env.example
+!frontend/.env.example
+
+
 
 # FastAPI / Python cache
 .pytest_cache/
