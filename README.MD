@@ -66,6 +66,7 @@ uvicorn app.main:app --reload --app-dir backend
 - Added cache stats and cache clear development endpoints
 - Improved backend validation and error handling
 - Refactored lap processing into a dedicated service layer
+- Refactored driver and race control processing into service layer
 
 ## Current Backend Endpoints
 
