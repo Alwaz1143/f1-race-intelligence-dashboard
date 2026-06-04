@@ -17,6 +17,15 @@ The app will allow users to select a season, Grand Prix, and session, then view 
 - HTTPX
 - python-dotenv
 
+### Environment Variables
+
+Create a `.env` file inside the `backend` folder:
+
+```env
+- OPENF1_BASE_URL=https://api.openf1.org/v1
+- FRONTEND_URL=http://localhost:5173
+```
+
 ### Run the backend
 
 From the `backend` directory:
@@ -68,6 +77,9 @@ uvicorn app.main:app --reload --app-dir backend
 - Refactored lap processing into a dedicated service layer
 - Refactored driver and race control processing into service layer
 - Refactored analytics logic into dedicated service layer
+- Added CORS support for React frontend integration
+- Improved API metadata and Swagger route grouping
+- Added root API information endpoint
 
 ## Current Backend Endpoints
 
