@@ -64,6 +64,8 @@ uvicorn app.main:app --reload --app-dir backend
 - Refactored reusable time and statistics utilities
 - Added in-memory caching for OpenF1 API responses
 - Added cache stats and cache clear development endpoints
+- Improved backend validation and error handling
+- Refactored lap processing into a dedicated service layer
 
 ## Current Backend Endpoints
 
@@ -78,6 +80,10 @@ uvicorn app.main:app --reload --app-dir backend
 - GET /api/analytics/compare-drivers?session_key=1234&driver1=1&driver2=4
 - GET /api/cache/stats
 - DELETE /api/cache/clear
+
+## Error Handling
+
+The backend returns clear HTTP errors for invalid inputs, missing sessions, missing drivers, and invalid driver comparison requests.
 
 ## Project Status
 >[!Note]
