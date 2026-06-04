@@ -2,6 +2,8 @@ import { useState } from "react";
 import { useHealth } from "../hooks/useHealth";
 import { useRaces } from "../hooks/useRaces";
 import { useSessions } from "../hooks/useSessions";
+import { useSessionOverview } from "../hooks/useSessionOverview";
+
 
 const availableYears = [2023, 2024, 2025];
 
@@ -29,6 +31,13 @@ function Dashboard() {
     isError: isSessionsError,
     error: sessionsError,
   } = useSessions(selectedMeetingKey);
+
+  const {
+    data: overviewData,
+    isLoading: isOverviewLoading,
+    isError: isOverviewError,
+    error: overviewError,
+  } = useSessionOverview(selectedSessionKey);
 
   const races = racesData?.races || [];
 
@@ -255,6 +264,82 @@ function Dashboard() {
               <div className="rounded-xl bg-slate-950 p-4">
                 <p className="text-sm text-slate-400">Session Key</p>
                 <p className="mt-1 font-semibold">{selectedSession.session_key}</p>
+              </div>
+            </div>
+          </section>
+        )}
+
+
+        {selectedSessionKey && isOverviewLoading && (
+          <div className="mt-6 rounded-2xl border border-slate-800 bg-slate-900/60 p-6 text-slate-400">
+            Loading session overview...
+          </div>
+        )}
+
+        {selectedSessionKey && isOverviewError && (
+          <div className="mt-6 rounded-2xl border border-red-900 bg-red-950/40 p-6 text-red-300">
+            Failed to load session overview: {overviewError?.message}
+          </div>
+        )}
+
+        {overviewData && (
+          <section className="mt-6 rounded-2xl border border-slate-800 bg-slate-900/60 p-6">
+            <div className="mb-5">
+              <p className="text-sm font-semibold uppercase tracking-[0.25em] text-red-400">
+                Session Overview
+              </p>
+              <h2 className="mt-2 text-2xl font-bold">
+                {overviewData.session?.session_name} Summary
+              </h2>
+            </div>
+
+            <div className="grid gap-4 md:grid-cols-3">
+              <div className="rounded-xl bg-slate-950 p-4">
+                <p className="text-sm text-slate-400">Total Drivers</p>
+                <p className="mt-2 text-2xl font-bold">
+                  {overviewData.overview?.total_drivers}
+                </p>
+              </div>
+
+              <div className="rounded-xl bg-slate-950 p-4">
+                <p className="text-sm text-slate-400">Total Lap Records</p>
+                <p className="mt-2 text-2xl font-bold">
+                  {overviewData.overview?.total_lap_records}
+                </p>
+              </div>
+
+              <div className="rounded-xl bg-slate-950 p-4">
+                <p className="text-sm text-slate-400">Valid Laps</p>
+                <p className="mt-2 text-2xl font-bold">
+                  {overviewData.overview?.valid_lap_count}
+                </p>
+              </div>
+
+              <div className="rounded-xl bg-slate-950 p-4">
+                <p className="text-sm text-slate-400">Max Lap Number</p>
+                <p className="mt-2 text-2xl font-bold">
+                  {overviewData.overview?.max_lap_number}
+                </p>
+              </div>
+
+              <div className="rounded-xl bg-slate-950 p-4">
+                <p className="text-sm text-slate-400">Fastest Lap</p>
+                <p className="mt-2 text-2xl font-bold">
+                  {overviewData.fastest_lap?.lap_time_formatted || "N/A"}
+                </p>
+                {overviewData.fastest_lap && (
+                  <p className="mt-1 text-sm text-slate-500">
+                    Driver {overviewData.fastest_lap.driver_number}, Lap{" "}
+                    {overviewData.fastest_lap.lap_number}
+                  </p>
+                )}
+              </div>
+
+              <div className="rounded-xl bg-slate-950 p-4">
+                <p className="text-sm text-slate-400">Race Control Events</p>
+                <p className="mt-2 text-2xl font-bold">
+                  {overviewData.overview?.race_control_event_count}
+                </p>
               </div>
             </div>
           </section>

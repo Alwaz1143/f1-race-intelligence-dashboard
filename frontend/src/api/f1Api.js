@@ -20,3 +20,11 @@ export const getSessions = async (meetingKey) => {
 
   return response.data;
 };
+
+export const getSessionOverview = async (sessionKey) => {
+  const response = await axiosClient.get("/analytics/session-overview", {
+    params: { session_key: sessionKey },
+  });
+
+  return response.data;
+};
