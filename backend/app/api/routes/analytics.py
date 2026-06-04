@@ -5,6 +5,8 @@ from app.services.openf1_client import openf1_client
 from app.utils.time_utils import format_lap_time
 from app.utils.stats_utils import calculate_driver_lap_stats
 
+from app.utils.validation_utils import (raise_not_found_if_empty, validate_different_drivers)
+
 router = APIRouter()
 
 
@@ -18,6 +20,11 @@ async def get_session_overview(
     sessions = await openf1_client.get(
         "sessions",
         params={"session_key": session_key}
+    )
+
+    raise_not_found_if_empty(
+    sessions,
+    f"No session found for session_key={session_key}"
     )
 
     drivers = await openf1_client.get(
@@ -121,6 +128,11 @@ async def get_fastest_laps(
         params={"session_key": session_key}
     )
 
+    raise_not_found_if_empty(
+    laps,
+    f"No lap data found for session_key={session_key}"
+    )
+
     drivers = await openf1_client.get(
         "drivers",
         params={"session_key": session_key}
@@ -213,9 +225,15 @@ async def compare_drivers(
     driver1: int = Query(..., description="First driver number"),
     driver2: int = Query(..., description="Second driver number")
 ):
+    validate_different_drivers(driver1, driver2)
     laps = await openf1_client.get(
         "laps",
         params={"session_key": session_key}
+    )
+
+    raise_not_found_if_empty(
+    laps,
+    f"No lap data found for session_key={session_key}"
     )
 
     drivers = await openf1_client.get(
@@ -237,6 +255,18 @@ async def compare_drivers(
                 "team_colour": driver.get("team_colour"),
                 "country_code": driver.get("country_code"),
             }
+
+    if driver1 not in driver_map:
+        raise_not_found_if_empty(
+            [],
+            f"Driver {driver1} not found in session_key={session_key}"
+        )
+
+    if driver2 not in driver_map:
+        raise_not_found_if_empty(
+            [],
+            f"Driver {driver2} not found in session_key={session_key}"
+        )
 
     driver1_laps = [
         lap for lap in laps

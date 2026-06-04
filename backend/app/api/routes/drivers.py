@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Query
-
+from app.utils.validation_utils import raise_not_found_if_empty
 from app.services.openf1_client import openf1_client
 
 router = APIRouter()
@@ -13,7 +13,10 @@ async def get_drivers(
         "drivers",
         params={"session_key": session_key}
     )
-
+    raise_not_found_if_empty(
+    drivers,
+    f"No drivers found for session_key={session_key}"
+    )
     cleaned_drivers = []
 
     for driver in drivers:

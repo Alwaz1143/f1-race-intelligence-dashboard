@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Query
-
+from app.utils.validation_utils import raise_not_found_if_empty
 from app.services.openf1_client import openf1_client
 
 router = APIRouter()
@@ -13,7 +13,10 @@ async def get_sessions(
         "sessions",
         params={"meeting_key": meeting_key}
     )
-
+    raise_not_found_if_empty(
+        sessions,
+        f"No sessions found for meeting_key={meeting_key}"
+    )
     cleaned_sessions = []
 
     for session in sessions:

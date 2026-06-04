@@ -48,6 +48,9 @@ class OpenF1Client:
                 return data
 
         except httpx.HTTPStatusError as e:
+            if e.response.status_code == 404:
+                return []
+
             raise HTTPException(
                 status_code=e.response.status_code,
                 detail=f"OpenF1 API error: {e.response.text}"
