@@ -28,3 +28,11 @@ export const getSessionOverview = async (sessionKey) => {
 
   return response.data;
 };
+
+export const getFastestLaps = async (sessionKey) => {
+  const response = await axiosClient.get("/analytics/fastest-laps", {
+    params: { session_key: sessionKey },
+  });
+
+  return response.data;
+};
