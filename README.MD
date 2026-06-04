@@ -62,6 +62,8 @@ uvicorn app.main:app --reload --app-dir backend
 - Fastest laps leaderboard endpoint
 - Driver comparison analytics endpoint
 - Refactored reusable time and statistics utilities
+- Added in-memory caching for OpenF1 API responses
+- Added cache stats and cache clear development endpoints
 
 ## Current Backend Endpoints
 
@@ -74,6 +76,8 @@ uvicorn app.main:app --reload --app-dir backend
 - GET /api/analytics/session-overview?session_key=1234
 - GET /api/analytics/fastest-laps?session_key=1234
 - GET /api/analytics/compare-drivers?session_key=1234&driver1=1&driver2=4
+- GET /api/cache/stats
+- DELETE /api/cache/clear
 
 ## Project Status
 >[!Note]
