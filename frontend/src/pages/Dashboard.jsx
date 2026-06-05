@@ -1,5 +1,8 @@
 import { useState } from "react";
 
+import SectionHeader from "../components/common/SectionHeader";
+import StatCard from "../components/cards/StatCard";
+
 import { useHealth } from "../hooks/useHealth";
 import { useRaces } from "../hooks/useRaces";
 import { useSessions } from "../hooks/useSessions";
@@ -355,63 +358,47 @@ function Dashboard() {
 
         {overviewData && (
           <section className="mt-6 rounded-2xl border border-slate-800 bg-slate-900/60 p-6">
-            <div className="mb-5">
-              <p className="text-sm font-semibold uppercase tracking-[0.25em] text-red-400">
-                Session Overview
-              </p>
-              <h2 className="mt-2 text-2xl font-bold">
-                {overviewData.session?.session_name} Summary
-              </h2>
-            </div>
+            <SectionHeader
+              eyebrow="Session Overview"
+              title={`${overviewData.session?.session_name} Summary`}
+            />
 
             <div className="grid gap-4 md:grid-cols-3">
-              <div className="rounded-xl bg-slate-950 p-4">
-                <p className="text-sm text-slate-400">Total Drivers</p>
-                <p className="mt-2 text-2xl font-bold">
-                  {overviewData.overview?.total_drivers}
-                </p>
-              </div>
+              <StatCard
+                label="Total Drivers"
+                value={overviewData.overview?.total_drivers}
+              />
 
-              <div className="rounded-xl bg-slate-950 p-4">
-                <p className="text-sm text-slate-400">Total Lap Records</p>
-                <p className="mt-2 text-2xl font-bold">
-                  {overviewData.overview?.total_lap_records}
-                </p>
-              </div>
+              <StatCard
+                label="Total Lap Records"
+                value={overviewData.overview?.total_lap_records}
+              />
 
-              <div className="rounded-xl bg-slate-950 p-4">
-                <p className="text-sm text-slate-400">Valid Laps</p>
-                <p className="mt-2 text-2xl font-bold">
-                  {overviewData.overview?.valid_lap_count}
-                </p>
-              </div>
+              <StatCard
+                label="Valid Laps"
+                value={overviewData.overview?.valid_lap_count}
+              />
 
-              <div className="rounded-xl bg-slate-950 p-4">
-                <p className="text-sm text-slate-400">Max Lap Number</p>
-                <p className="mt-2 text-2xl font-bold">
-                  {overviewData.overview?.max_lap_number}
-                </p>
-              </div>
+              <StatCard
+                label="Max Lap Number"
+                value={overviewData.overview?.max_lap_number}
+              />
 
-              <div className="rounded-xl bg-slate-950 p-4">
-                <p className="text-sm text-slate-400">Fastest Lap</p>
-                <p className="mt-2 text-2xl font-bold">
-                  {overviewData.fastest_lap?.lap_time_formatted || "N/A"}
-                </p>
-                {overviewData.fastest_lap && (
-                  <p className="mt-1 text-sm text-slate-500">
-                    Driver {overviewData.fastest_lap.driver_number}, Lap{" "}
-                    {overviewData.fastest_lap.lap_number}
-                  </p>
-                )}
-              </div>
+              <StatCard
+                label="Fastest Lap"
+                value={overviewData.fastest_lap?.lap_time_formatted || "N/A"}
+                valueClassName="text-green-400"
+                helper={
+                  overviewData.fastest_lap
+                    ? `Driver ${overviewData.fastest_lap.driver_number}, Lap ${overviewData.fastest_lap.lap_number}`
+                    : null
+                }
+              />
 
-              <div className="rounded-xl bg-slate-950 p-4">
-                <p className="text-sm text-slate-400">Race Control Events</p>
-                <p className="mt-2 text-2xl font-bold">
-                  {overviewData.overview?.race_control_event_count}
-                </p>
-              </div>
+              <StatCard
+                label="Race Control Events"
+                value={overviewData.overview?.race_control_event_count}
+              />
             </div>
           </section>
         )}
@@ -430,14 +417,10 @@ function Dashboard() {
 
         {fastestLaps.length > 0 && (
           <section className="mt-6 rounded-2xl border border-slate-800 bg-slate-900/60 p-6">
-            <div className="mb-5">
-              <p className="text-sm font-semibold uppercase tracking-[0.25em] text-red-400">
-                Fastest Lap Leaderboard
-              </p>
-              <h2 className="mt-2 text-2xl font-bold">
-                Top Fastest Laps
-              </h2>
-            </div>
+            <SectionHeader
+              eyebrow="Fastest Lap Leaderboard"
+              title="Top Fastest Laps"
+            />
 
             <div className="overflow-x-auto">
               <table className="w-full min-w-[850px] border-collapse text-left text-sm">
@@ -520,17 +503,11 @@ function Dashboard() {
 
         {drivers.length > 0 && (
           <section className="mt-6 rounded-2xl border border-slate-800 bg-slate-900/60 p-6">
-            <div className="mb-5">
-              <p className="text-sm font-semibold uppercase tracking-[0.25em] text-red-400">
-                Driver List
-              </p>
-              <h2 className="mt-2 text-2xl font-bold">
-                Session Drivers
-              </h2>
-              <p className="mt-2 text-sm text-slate-400">
-                {driversData?.count} drivers found for this session.
-              </p>
-            </div>
+            <SectionHeader
+              eyebrow="Driver List"
+              title="Session Drivers"
+              description={`${driversData?.count} drivers found for this session.`}
+            />
 
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
               {drivers.map((driver) => (
@@ -611,17 +588,11 @@ function Dashboard() {
 
         {drivers.length > 0 && (
           <section className="mt-6 rounded-2xl border border-slate-800 bg-slate-900/60 p-6">
-            <div className="mb-5">
-              <p className="text-sm font-semibold uppercase tracking-[0.25em] text-red-400">
-                Driver Comparison
-              </p>
-              <h2 className="mt-2 text-2xl font-bold">
-                Compare Two Drivers
-              </h2>
-              <p className="mt-2 text-sm text-slate-400">
-                Select two drivers from this session to compare lap-time performance.
-              </p>
-            </div>
+            <SectionHeader
+              eyebrow="Driver Comparison"
+              title="Compare Two Drivers"
+              description="Select two drivers from this session to compare lap-time performance."
+            />
 
             <div className="grid gap-4 md:grid-cols-2">
               <div>
@@ -958,17 +929,11 @@ function Dashboard() {
 
         {raceControlData && (
           <section className="mt-6 rounded-2xl border border-slate-800 bg-slate-900/60 p-6">
-            <div className="mb-5">
-              <p className="text-sm font-semibold uppercase tracking-[0.25em] text-red-400">
-                Race Control
-              </p>
-              <h2 className="mt-2 text-2xl font-bold">
-                Official Session Messages
-              </h2>
-              <p className="mt-2 text-sm text-slate-400">
-                {raceControlData.count} race control messages found for this session.
-              </p>
-            </div>
+            <SectionHeader
+              eyebrow="Race Control"
+              title="Official Session Messages"
+              description={`${raceControlData.count} race control messages found for this session.`}
+            />
 
             <div className="grid gap-4 md:grid-cols-3">
               <div className="rounded-xl bg-slate-950 p-4">
