@@ -36,3 +36,11 @@ export const getFastestLaps = async (sessionKey) => {
 
   return response.data;
 };
+
+export const getDrivers = async (sessionKey) => {
+  const response = await axiosClient.get("/drivers", {
+    params: { session_key: sessionKey },
+  });
+
+  return response.data;
+};
