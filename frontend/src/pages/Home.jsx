@@ -3,7 +3,7 @@ import { Link } from "react-router";
 function Home() {
   return (
     <main className="min-h-screen bg-slate-950 text-slate-100">
-      <section className="mx-auto flex min-h-screen max-w-6xl flex-col justify-center px-6 py-16">
+      <section className="mx-auto flex min-h-[calc(100vh-73px)] max-w-6xl flex-col justify-center px-6 py-16">
         <p className="mb-4 text-sm font-semibold uppercase tracking-[0.3em] text-red-400">
           Formula 1 Analytics
         </p>

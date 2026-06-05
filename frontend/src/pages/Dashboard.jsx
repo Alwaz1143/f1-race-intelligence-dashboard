@@ -140,35 +140,40 @@ function Dashboard() {
   };
 
   return (
-    <main className="min-h-screen bg-slate-950 px-6 py-10 text-slate-100">
+    <main className="min-h-screen bg-slate-950 px-6 py-8 text-slate-100">
       <div className="mx-auto max-w-6xl">
-        <div className="mb-8 flex flex-col justify-between gap-4 md:flex-row md:items-center">
-          <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.25em] text-red-400">
-              Race Dashboard
-            </p>
-            <h1 className="mt-2 text-3xl font-bold">
-              F1 Race Intelligence Dashboard
-            </h1>
-            <p className="mt-3 text-slate-400">
-              Select a season and Grand Prix to start analyzing race sessions.
-            </p>
-          </div>
+        <div className="mb-8 rounded-2xl border border-slate-800 bg-slate-900/60 p-6">
+          <div className="flex flex-col justify-between gap-4 md:flex-row md:items-center">
+            <div>
+              <p className="text-sm font-semibold uppercase tracking-[0.25em] text-red-400">
+                Race Dashboard
+              </p>
 
-          <div className="rounded-xl border border-slate-800 bg-slate-900 px-4 py-3 text-sm">
-            {isHealthLoading && <span className="text-slate-400">Checking API...</span>}
+              <h1 className="mt-2 text-3xl font-bold">
+                F1 Race Intelligence Dashboard
+              </h1>
 
-            {!isHealthLoading && !isHealthError && (
-              <span className="text-green-400">
-                API Status: {healthData?.status}
-              </span>
-            )}
+              <p className="mt-3 max-w-3xl text-slate-400">
+                Select a season, Grand Prix, and session to explore lap-time analytics,
+                fastest laps, driver comparisons, and race control messages.
+              </p>
+            </div>
 
-            {isHealthError && (
-              <span className="text-red-400">
-                API Offline
-              </span>
-            )}
+            <div className="rounded-xl border border-slate-800 bg-slate-950 px-4 py-3 text-sm">
+              {isHealthLoading && (
+                <span className="text-slate-400">Checking API...</span>
+              )}
+
+              {!isHealthLoading && !isHealthError && (
+                <span className="text-green-400">
+                  API Status: {healthData?.status}
+                </span>
+              )}
+
+              {isHealthError && (
+                <span className="text-red-400">API Offline</span>
+              )}
+            </div>
           </div>
         </div>
 
