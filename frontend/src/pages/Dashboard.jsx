@@ -6,7 +6,7 @@ import { useSessions } from "../hooks/useSessions";
 import { useSessionOverview } from "../hooks/useSessionOverview";
 import { useFastestLaps } from "../hooks/useFastestLaps";
 import { useDrivers } from "../hooks/useDrivers";
-
+import { useRaceControl } from "../hooks/useRaceControl";
 
 const availableYears = [2023, 2024, 2025];
 
@@ -55,6 +55,17 @@ function Dashboard() {
     isError: isDriversError,
     error: driversError,
   } = useDrivers(selectedSessionKey);
+
+  const {
+    data: raceControlData,
+    isLoading: isRaceControlLoading,
+    isError: isRaceControlError,
+    error: raceControlError,
+  } = useRaceControl(selectedSessionKey);
+
+  const raceControlMessages = raceControlData?.messages || [];
+  const raceControlCategoryCounts = raceControlData?.event_counts?.by_category || {};
+  const raceControlFlagCounts = raceControlData?.event_counts?.by_flag || {};
 
   const drivers = driversData?.drivers || [];
 
@@ -544,6 +555,159 @@ function Dashboard() {
                 </div>
               ))}
             </div>
+          </section>
+        )}
+
+        {selectedSessionKey && isRaceControlLoading && (
+          <div className="mt-6 rounded-2xl border border-slate-800 bg-slate-900/60 p-6 text-slate-400">
+            Loading race control messages...
+          </div>
+        )}
+
+        {selectedSessionKey && isRaceControlError && (
+          <div className="mt-6 rounded-2xl border border-red-900 bg-red-950/40 p-6 text-red-300">
+            Failed to load race control messages: {raceControlError?.message}
+          </div>
+        )}
+
+        {raceControlData && (
+          <section className="mt-6 rounded-2xl border border-slate-800 bg-slate-900/60 p-6">
+            <div className="mb-5">
+              <p className="text-sm font-semibold uppercase tracking-[0.25em] text-red-400">
+                Race Control
+              </p>
+              <h2 className="mt-2 text-2xl font-bold">
+                Official Session Messages
+              </h2>
+              <p className="mt-2 text-sm text-slate-400">
+                {raceControlData.count} race control messages found for this session.
+              </p>
+            </div>
+
+            <div className="grid gap-4 md:grid-cols-3">
+              <div className="rounded-xl bg-slate-950 p-4">
+                <p className="text-sm text-slate-400">Total Events</p>
+                <p className="mt-2 text-2xl font-bold">{raceControlData.count}</p>
+              </div>
+
+              <div className="rounded-xl bg-slate-950 p-4">
+                <p className="text-sm text-slate-400">Categories</p>
+                <p className="mt-2 text-2xl font-bold">
+                  {Object.keys(raceControlCategoryCounts).length}
+                </p>
+              </div>
+
+              <div className="rounded-xl bg-slate-950 p-4">
+                <p className="text-sm text-slate-400">Flag Types</p>
+                <p className="mt-2 text-2xl font-bold">
+                  {Object.keys(raceControlFlagCounts).length}
+                </p>
+              </div>
+            </div>
+
+            <div className="mt-5 grid gap-4 md:grid-cols-2">
+              <div className="rounded-xl bg-slate-950 p-4">
+                <h3 className="font-semibold text-slate-100">Category Counts</h3>
+
+                <div className="mt-3 space-y-2">
+                  {Object.keys(raceControlCategoryCounts).length > 0 ? (
+                    Object.entries(raceControlCategoryCounts).map(([category, count]) => (
+                      <div
+                        key={category}
+                        className="flex items-center justify-between rounded-lg bg-slate-900 px-3 py-2 text-sm"
+                      >
+                        <span className="text-slate-300">{category}</span>
+                        <span className="font-semibold text-red-400">{count}</span>
+                      </div>
+                    ))
+                  ) : (
+                    <p className="text-sm text-slate-500">No category data available.</p>
+                  )}
+                </div>
+              </div>
+
+              <div className="rounded-xl bg-slate-950 p-4">
+                <h3 className="font-semibold text-slate-100">Flag Counts</h3>
+
+                <div className="mt-3 space-y-2">
+                  {Object.keys(raceControlFlagCounts).length > 0 ? (
+                    Object.entries(raceControlFlagCounts).map(([flag, count]) => (
+                      <div
+                        key={flag}
+                        className="flex items-center justify-between rounded-lg bg-slate-900 px-3 py-2 text-sm"
+                      >
+                        <span className="text-slate-300">{flag}</span>
+                        <span className="font-semibold text-yellow-400">{count}</span>
+                      </div>
+                    ))
+                  ) : (
+                    <p className="text-sm text-slate-500">No flag data available.</p>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {raceControlMessages.length > 0 ? (
+              <div className="mt-6 overflow-x-auto">
+                <table className="w-full min-w-[900px] border-collapse text-left text-sm">
+                  <thead>
+                    <tr className="border-b border-slate-800 text-slate-400">
+                      <th className="px-4 py-3">Time</th>
+                      <th className="px-4 py-3">Lap</th>
+                      <th className="px-4 py-3">Category</th>
+                      <th className="px-4 py-3">Flag</th>
+                      <th className="px-4 py-3">Driver</th>
+                      <th className="px-4 py-3">Message</th>
+                    </tr>
+                  </thead>
+
+                  <tbody>
+                    {raceControlMessages.slice(0, 50).map((message, index) => (
+                      <tr
+                        key={`${message.date}-${index}`}
+                        className="border-b border-slate-800/70 transition hover:bg-slate-800/50"
+                      >
+                        <td className="px-4 py-3 text-slate-300">
+                          {message.date
+                            ? new Date(message.date).toLocaleTimeString()
+                            : "N/A"}
+                        </td>
+
+                        <td className="px-4 py-3 text-slate-300">
+                          {message.lap_number || "N/A"}
+                        </td>
+
+                        <td className="px-4 py-3 text-slate-300">
+                          {message.category || "N/A"}
+                        </td>
+
+                        <td className="px-4 py-3 font-semibold text-yellow-400">
+                          {message.flag || "N/A"}
+                        </td>
+
+                        <td className="px-4 py-3 text-slate-300">
+                          {message.driver_number ? `#${message.driver_number}` : "N/A"}
+                        </td>
+
+                        <td className="px-4 py-3 text-slate-200">
+                          {message.message || "N/A"}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+
+                {raceControlMessages.length > 50 && (
+                  <p className="mt-3 text-sm text-slate-500">
+                    Showing first 50 messages out of {raceControlMessages.length}.
+                  </p>
+                )}
+              </div>
+            ) : (
+              <div className="mt-6 rounded-xl bg-slate-950 p-4 text-sm text-slate-500">
+                No race control messages found for this session.
+              </div>
+            )}
           </section>
         )}
 

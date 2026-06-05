@@ -44,3 +44,11 @@ export const getDrivers = async (sessionKey) => {
 
   return response.data;
 };
+
+export const getRaceControl = async (sessionKey) => {
+  const response = await axiosClient.get("/race-control", {
+    params: { session_key: sessionKey },
+  });
+
+  return response.data;
+};
