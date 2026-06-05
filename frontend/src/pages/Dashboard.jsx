@@ -2,6 +2,8 @@ import { useState } from "react";
 
 import SectionHeader from "../components/common/SectionHeader";
 import StatCard from "../components/cards/StatCard";
+import LoadingState from "../components/common/LoadingState";
+import ErrorState from "../components/common/ErrorState";
 
 import { useHealth } from "../hooks/useHealth";
 import { useRaces } from "../hooks/useRaces";
@@ -244,15 +246,11 @@ function Dashboard() {
 
 
         {isRacesLoading && (
-          <div className="mt-6 rounded-2xl border border-slate-800 bg-slate-900/60 p-6 text-slate-400">
-            Loading races for {year}...
-          </div>
+          <LoadingState message={`Loading races for ${year}...`} />
         )}
 
         {isRacesError && (
-          <div className="mt-6 rounded-2xl border border-red-900 bg-red-950/40 p-6 text-red-300">
-            Failed to load races: {racesError?.message}
-          </div>
+          <ErrorState message="Failed to load races" error={racesError} />
         )}
 
         {!isRacesLoading && !isRacesError && races.length > 0 && (
@@ -265,15 +263,11 @@ function Dashboard() {
         )}
 
         {selectedMeetingKey && isSessionsLoading && (
-          <div className="mt-6 rounded-2xl border border-slate-800 bg-slate-900/60 p-6 text-slate-400">
-            Loading sessions...
-          </div>
+          <LoadingState message="Loading sessions..." />
         )}
 
         {selectedMeetingKey && isSessionsError && (
-          <div className="mt-6 rounded-2xl border border-red-900 bg-red-950/40 p-6 text-red-300">
-            Failed to load sessions: {sessionsError?.message}
-          </div>
+          <ErrorState message="Failed to load sessions" error={sessionsError} />
         )}
 
         {selectedRace && (
@@ -345,15 +339,11 @@ function Dashboard() {
 
 
         {selectedSessionKey && isOverviewLoading && (
-          <div className="mt-6 rounded-2xl border border-slate-800 bg-slate-900/60 p-6 text-slate-400">
-            Loading session overview...
-          </div>
+          <LoadingState message="Loading session overview..." />
         )}
 
         {selectedSessionKey && isOverviewError && (
-          <div className="mt-6 rounded-2xl border border-red-900 bg-red-950/40 p-6 text-red-300">
-            Failed to load session overview: {overviewError?.message}
-          </div>
+          <ErrorState message="Failed to load session overview" error={overviewError} />
         )}
 
         {overviewData && (
@@ -404,15 +394,11 @@ function Dashboard() {
         )}
 
         {selectedSessionKey && isFastestLapsLoading && (
-          <div className="mt-6 rounded-2xl border border-slate-800 bg-slate-900/60 p-6 text-slate-400">
-            Loading fastest lap leaderboard...
-          </div>
+          <LoadingState message="Loading fastest lap leaderboard..." />
         )}
 
         {selectedSessionKey && isFastestLapsError && (
-          <div className="mt-6 rounded-2xl border border-red-900 bg-red-950/40 p-6 text-red-300">
-            Failed to load fastest laps: {fastestLapsError?.message}
-          </div>
+          <ErrorState message="Failed to load fastest laps" error={fastestLapsError} />
         )}
 
         {fastestLaps.length > 0 && (
@@ -490,15 +476,11 @@ function Dashboard() {
         )}
 
         {selectedSessionKey && isDriversLoading && (
-          <div className="mt-6 rounded-2xl border border-slate-800 bg-slate-900/60 p-6 text-slate-400">
-            Loading drivers...
-          </div>
+          <LoadingState message="Loading drivers..." />
         )}
 
         {selectedSessionKey && isDriversError && (
-          <div className="mt-6 rounded-2xl border border-red-900 bg-red-950/40 p-6 text-red-300">
-            Failed to load drivers: {driversError?.message}
-          </div>
+          <ErrorState message="Failed to load drivers" error={driversError} />
         )}
 
         {drivers.length > 0 && (
@@ -575,15 +557,14 @@ function Dashboard() {
         )}
 
         {selectedSessionKey && isRaceControlLoading && (
-          <div className="mt-6 rounded-2xl border border-slate-800 bg-slate-900/60 p-6 text-slate-400">
-            Loading race control messages...
-          </div>
+          <LoadingState message="Loading race control messages..." />
         )}
 
         {selectedSessionKey && isRaceControlError && (
-          <div className="mt-6 rounded-2xl border border-red-900 bg-red-950/40 p-6 text-red-300">
-            Failed to load race control messages: {raceControlError?.message}
-          </div>
+          <ErrorState
+            message="Failed to load race control messages"
+            error={raceControlError}
+          />
         )}
 
         {drivers.length > 0 && (
@@ -643,15 +624,11 @@ function Dashboard() {
             )}
 
             {isComparisonLoading && (
-              <div className="mt-6 rounded-xl bg-slate-950 p-4 text-slate-400">
-                Loading driver comparison...
-              </div>
+              <LoadingState message="Loading driver comparison..." />
             )}
 
             {isComparisonError && (
-              <div className="mt-6 rounded-xl border border-red-900 bg-red-950/40 p-4 text-red-300">
-                Failed to compare drivers: {comparisonError?.message}
-              </div>
+              <ErrorState message="Failed to compare drivers" error={comparisonError} />
             )}
 
             {comparisonData && (
