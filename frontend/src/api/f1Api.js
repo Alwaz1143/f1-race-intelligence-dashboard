@@ -52,3 +52,15 @@ export const getRaceControl = async (sessionKey) => {
 
   return response.data;
 };
+
+export const compareDrivers = async (sessionKey, driver1, driver2) => {
+  const response = await axiosClient.get("/analytics/compare-drivers", {
+    params: {
+      session_key: sessionKey,
+      driver1,
+      driver2,
+    },
+  });
+
+  return response.data;
+};
