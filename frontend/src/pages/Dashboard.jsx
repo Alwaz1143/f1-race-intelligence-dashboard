@@ -6,6 +6,7 @@ import LoadingState from "../components/common/LoadingState";
 import ErrorState from "../components/common/ErrorState";
 import DashboardFilters from "../components/filters/DashboardFilters";
 import DriverList from "../components/drivers/DriverList";
+import FastestLapLeaderboard from "../components/laps/FastestLapLeaderboard";
 
 import { useHealth } from "../hooks/useHealth";
 import { useRaces } from "../hooks/useRaces";
@@ -345,79 +346,7 @@ function Dashboard() {
           <ErrorState message="Failed to load fastest laps" error={fastestLapsError} />
         )}
 
-        {fastestLaps.length > 0 && (
-          <section className="mt-6 rounded-2xl border border-slate-800 bg-slate-900/60 p-6">
-            <SectionHeader
-              eyebrow="Fastest Lap Leaderboard"
-              title="Top Fastest Laps"
-            />
-
-            <div className="overflow-x-auto">
-              <table className="w-full min-w-[850px] border-collapse text-left text-sm">
-                <thead>
-                  <tr className="border-b border-slate-800 text-slate-400">
-                    <th className="px-4 py-3">Pos</th>
-                    <th className="px-4 py-3">Driver</th>
-                    <th className="px-4 py-3">Team</th>
-                    <th className="px-4 py-3">Fastest Lap</th>
-                    <th className="px-4 py-3">Lap</th>
-                    <th className="px-4 py-3">S1</th>
-                    <th className="px-4 py-3">S2</th>
-                    <th className="px-4 py-3">S3</th>
-                  </tr>
-                </thead>
-
-                <tbody>
-                  {fastestLaps.map((item) => (
-                    <tr
-                      key={item.driver_number}
-                      className="border-b border-slate-800/70 transition hover:bg-slate-800/50"
-                    >
-                      <td className="px-4 py-3 font-bold text-red-400">
-                        P{item.position}
-                      </td>
-
-                      <td className="px-4 py-3">
-                        <div>
-                          <p className="font-semibold text-slate-100">
-                            {item.name_acronym || item.full_name || `Driver ${item.driver_number}`}
-                          </p>
-                          <p className="text-xs text-slate-500">
-                            #{item.driver_number}
-                          </p>
-                        </div>
-                      </td>
-
-                      <td className="px-4 py-3 text-slate-300">
-                        {item.team_name || "N/A"}
-                      </td>
-
-                      <td className="px-4 py-3 font-semibold text-green-400">
-                        {item.lap_time_formatted || "N/A"}
-                      </td>
-
-                      <td className="px-4 py-3 text-slate-300">
-                        {item.lap_number || "N/A"}
-                      </td>
-
-                      <td className="px-4 py-3 text-slate-300">
-                        {item.duration_sector_1?.toFixed?.(3) || "N/A"}
-                      </td>
-
-                      <td className="px-4 py-3 text-slate-300">
-                        {item.duration_sector_2?.toFixed?.(3) || "N/A"}
-                      </td>
-
-                      <td className="px-4 py-3 text-slate-300">
-                        {item.duration_sector_3?.toFixed?.(3) || "N/A"}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </section>
-        )}
+        <FastestLapLeaderboard fastestLaps={fastestLaps} />
 
         {selectedSessionKey && isDriversLoading && (
           <LoadingState message="Loading drivers..." />
