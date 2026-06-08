@@ -12,6 +12,7 @@ import DriverComparisonPanel from "../components/comparison/DriverComparisonPane
 import SessionOverview from "../components/overview/SessionOverview";
 import RaceDetails from "../components/overview/RaceDetails";
 import SessionDetails from "../components/overview/SessionDetails";
+import EmptyDashboardState from "../components/common/EmptyDashboardState";
 
 import { useHealth } from "../hooks/useHealth";
 import { useRaces } from "../hooks/useRaces";
@@ -202,11 +203,8 @@ function Dashboard() {
         )}
 
         {!isRacesLoading && !isRacesError && races.length > 0 && (
-          <div className="mt-6 rounded-2xl border border-slate-800 bg-slate-900/60 p-6">
-            <h2 className="text-xl font-semibold">Available Races</h2>
-            <p className="mt-2 text-slate-400">
-              Found {racesData?.count} races for the {year} season.
-            </p>
+          <div className="mt-4 text-sm text-slate-500">
+            Found {racesData?.count} races for the {year} season.
           </div>
         )}
 
@@ -221,7 +219,7 @@ function Dashboard() {
         <RaceDetails selectedRace={selectedRace} />
 
         <SessionDetails selectedSession={selectedSession} />
-
+        {!selectedSessionKey && <EmptyDashboardState />}
 
         {selectedSessionKey && isOverviewLoading && (
           <LoadingState message="Loading session overview..." />
