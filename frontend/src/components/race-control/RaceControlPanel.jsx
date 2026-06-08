@@ -13,14 +13,14 @@ function RaceControlPanel({
   }
 
   return (
-    <section className="mt-6 rounded-2xl border border-slate-800 bg-slate-900/60 p-6">
+    <section className="mt-6 rounded-2xl border border-slate-800 bg-slate-900/60 p-4 sm:p-6">
       <SectionHeader
         eyebrow="Race Control"
         title="Official Session Messages"
         description={`${raceControlData.count} race control messages found for this session.`}
       />
 
-      <div className="grid gap-4 md:grid-cols-3">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <StatCard label="Total Events" value={raceControlData.count} />
 
         <StatCard
@@ -34,7 +34,7 @@ function RaceControlPanel({
         />
       </div>
 
-      <div className="mt-5 grid gap-4 md:grid-cols-2">
+      <div className="mt-5 grid gap-4 lg:grid-cols-2">
         <div className="rounded-xl bg-slate-950 p-4">
           <h3 className="font-semibold text-slate-100">Category Counts</h3>
 

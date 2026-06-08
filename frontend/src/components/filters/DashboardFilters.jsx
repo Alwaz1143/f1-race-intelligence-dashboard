@@ -12,7 +12,7 @@ function DashboardFilters({
   handleSessionChange,
 }) {
   return (
-    <section className="grid gap-5 rounded-2xl border border-slate-800 bg-slate-900/60 p-6 md:grid-cols-3">
+    <section className="grid gap-5 rounded-2xl border border-slate-800 bg-slate-900/60 p-4 sm:p-6 md:grid-cols-3">
       <div>
         <label className="mb-2 block text-sm font-medium text-slate-300">
           Select Season

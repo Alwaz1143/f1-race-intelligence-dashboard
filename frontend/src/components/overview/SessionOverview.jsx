@@ -7,13 +7,13 @@ function SessionOverview({ overviewData }) {
   }
 
   return (
-    <section className="mt-6 rounded-2xl border border-slate-800 bg-slate-900/60 p-6">
+    <section className="mt-6 rounded-2xl border border-slate-800 bg-slate-900/60 p-4 sm:p-6">
       <SectionHeader
         eyebrow="Session Overview"
         title={`${overviewData.session?.session_name} Summary`}
       />
 
-      <div className="grid gap-4 md:grid-cols-3">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <StatCard
           label="Total Drivers"
           value={overviewData.overview?.total_drivers}

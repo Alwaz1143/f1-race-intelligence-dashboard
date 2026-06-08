@@ -6,12 +6,12 @@ function SessionDetails({ selectedSession }) {
   }
 
   return (
-    <section className="mt-6 rounded-2xl border border-slate-800 bg-slate-900/60 p-6">
+    <section className="mt-6 rounded-2xl border border-slate-800 bg-slate-900/60 p-4 sm:p-6">
       <h2 className="text-xl font-semibold">
         Selected Session: {selectedSession.session_name}
       </h2>
 
-      <div className="mt-4 grid gap-4 md:grid-cols-4">
+      <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <div className="rounded-xl bg-slate-950 p-4">
           <p className="text-sm text-slate-400">Session Type</p>
           <p className="mt-1 font-semibold">{selectedSession.session_type}</p>

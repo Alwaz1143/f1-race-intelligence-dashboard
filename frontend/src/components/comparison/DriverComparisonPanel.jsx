@@ -32,14 +32,14 @@ function DriverComparisonPanel({
   }
 
   return (
-    <section className="mt-6 rounded-2xl border border-slate-800 bg-slate-900/60 p-6">
+    <section className="mt-6 rounded-2xl border border-slate-800 bg-slate-900/60 p-4 sm:p-6">
       <SectionHeader
         eyebrow="Driver Comparison"
         title="Compare Two Drivers"
         description="Select two drivers from this session to compare lap-time performance."
       />
 
-      <div className="grid gap-4 md:grid-cols-2">
+      <div className="grid gap-4 lg:grid-cols-2">
         <div>
           <label className="mb-2 block text-sm font-medium text-slate-300">
             Driver 1
@@ -97,7 +97,7 @@ function DriverComparisonPanel({
 
       {comparisonData && (
         <div className="mt-6">
-          <div className="grid gap-4 md:grid-cols-2">
+          <div className="grid gap-4 lg:grid-cols-2">
             <div className="rounded-2xl border border-slate-800 bg-slate-950 p-5">
               <h3 className="text-xl font-bold text-slate-100">
                 {comparisonData.drivers?.driver1?.name_acronym ||
@@ -208,7 +208,7 @@ function DriverComparisonPanel({
                 </p>
               </div>
 
-              <div className="h-[360px] w-full">
+              <div className="h-[300px] w-full sm:h-[360px]">
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={comparisonChartData}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />

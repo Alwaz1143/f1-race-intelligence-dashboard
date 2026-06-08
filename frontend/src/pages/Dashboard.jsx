@@ -141,7 +141,7 @@ function Dashboard() {
   };
 
   return (
-    <main className="min-h-screen bg-slate-950 px-6 py-8 text-slate-100">
+    <main className="min-h-screen bg-slate-950 px-4 py-6 text-slate-100 sm:px-6 sm:py-8">
       <div className="mx-auto max-w-6xl">
         <div className="mb-8 rounded-2xl border border-slate-800 bg-slate-900/60 p-6">
           <div className="flex flex-col justify-between gap-4 md:flex-row md:items-center">

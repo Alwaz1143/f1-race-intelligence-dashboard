@@ -3,12 +3,12 @@ import { Link, NavLink } from "react-router";
 function Navbar() {
   return (
     <header className="sticky top-0 z-50 border-b border-slate-800 bg-slate-950/90 backdrop-blur">
-      <nav className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
+      <nav className="mx-auto flex max-w-6xl flex-col gap-3 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
         <Link to="/" className="text-lg font-bold text-slate-100">
           F1<span className="text-red-500">Intel</span>
         </Link>
 
-        <div className="flex items-center gap-4 text-sm">
+        <div className="flex flex-wrap items-center gap-3 text-sm">
           <NavLink
             to="/"
             className={({ isActive }) =>

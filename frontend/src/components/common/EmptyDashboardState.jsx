@@ -1,6 +1,6 @@
 function EmptyDashboardState() {
   return (
-    <section className="mt-6 rounded-2xl border border-dashed border-slate-700 bg-slate-900/40 p-8">
+    <section className="mt-6 rounded-2xl border border-dashed border-slate-700 bg-slate-900/40 p-5 sm:p-8">
       <div className="max-w-3xl">
         <p className="text-sm font-semibold uppercase tracking-[0.25em] text-red-400">
           Getting Started
@@ -16,7 +16,7 @@ function EmptyDashboardState() {
           control messages.
         </p>
 
-        <div className="mt-6 grid gap-4 md:grid-cols-4">
+        <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <div className="rounded-xl bg-slate-950 p-4">
             <p className="text-xl font-bold text-red-400">01</p>
             <p className="mt-2 font-semibold text-slate-100">Season</p>

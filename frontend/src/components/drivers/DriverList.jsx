@@ -6,14 +6,14 @@ function DriverList({ drivers, driversCount }) {
   }
 
   return (
-    <section className="mt-6 rounded-2xl border border-slate-800 bg-slate-900/60 p-6">
+    <section className="mt-6 rounded-2xl border border-slate-800 bg-slate-900/60 p-4 sm:p-6">
       <SectionHeader
         eyebrow="Driver List"
         title="Session Drivers"
         description={`${driversCount} drivers found for this session.`}
       />
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {drivers.map((driver) => (
           <div
             key={driver.driver_number}

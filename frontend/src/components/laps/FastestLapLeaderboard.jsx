@@ -7,7 +7,7 @@ function FastestLapLeaderboard({ fastestLaps }) {
   }
 
   return (
-    <section className="mt-6 rounded-2xl border border-slate-800 bg-slate-900/60 p-6">
+    <section className="mt-6 rounded-2xl border border-slate-800 bg-slate-900/60 p-4 sm:p-6">
       <SectionHeader
         eyebrow="Fastest Lap Leaderboard"
         title="Top Fastest Laps"
