@@ -13,6 +13,8 @@ import SectionHeader from "../common/SectionHeader";
 import LoadingState from "../common/LoadingState";
 import ErrorState from "../common/ErrorState";
 
+import { formatSecondsWithUnit } from "../../utils/formatters";
+
 function DriverComparisonPanel({
   drivers,
   selectedDriver1,
@@ -283,21 +285,21 @@ function DriverComparisonPanel({
               <div className="rounded-xl bg-slate-900 p-4">
                 <p className="text-sm text-slate-400">Fastest Lap Difference</p>
                 <p className="mt-2 text-xl font-bold">
-                  {comparisonData.differences?.fastest_lap_difference ?? "N/A"}s
+                  {formatSecondsWithUnit(comparisonData.differences?.fastest_lap_difference)}
                 </p>
               </div>
 
               <div className="rounded-xl bg-slate-900 p-4">
                 <p className="text-sm text-slate-400">Average Lap Difference</p>
                 <p className="mt-2 text-xl font-bold">
-                  {comparisonData.differences?.average_lap_difference ?? "N/A"}s
+                  {formatSecondsWithUnit(comparisonData.differences?.average_lap_difference)}
                 </p>
               </div>
 
               <div className="rounded-xl bg-slate-900 p-4">
                 <p className="text-sm text-slate-400">Median Lap Difference</p>
                 <p className="mt-2 text-xl font-bold">
-                  {comparisonData.differences?.median_lap_difference ?? "N/A"}s
+                  {formatSecondsWithUnit(comparisonData.differences?.median_lap_difference)}
                 </p>
               </div>
             </div>
@@ -339,7 +341,7 @@ function DriverComparisonPanel({
                       </td>
 
                       <td className="px-4 py-3 font-semibold">
-                        {lap.difference}s
+                        {formatSecondsWithUnit(lap.difference)}
                       </td>
 
                       <td className="px-4 py-3 text-red-400">

@@ -1,3 +1,5 @@
+import { formatDateTime } from "../../utils/formatters";
+
 function SessionDetails({ selectedSession }) {
   if (!selectedSession) {
     return null;
@@ -25,9 +27,7 @@ function SessionDetails({ selectedSession }) {
         <div className="rounded-xl bg-slate-950 p-4">
           <p className="text-sm text-slate-400">Start</p>
           <p className="mt-1 font-semibold">
-            {selectedSession.date_start
-              ? new Date(selectedSession.date_start).toLocaleString()
-              : "N/A"}
+            {formatDateTime(selectedSession.date_start)} 
           </p>
         </div>
 

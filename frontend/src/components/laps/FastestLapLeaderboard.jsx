@@ -1,4 +1,5 @@
 import SectionHeader from "../common/SectionHeader";
+import { formatSeconds } from "../../utils/formatters";
 
 function FastestLapLeaderboard({ fastestLaps }) {
   if (!fastestLaps || fastestLaps.length === 0) {
@@ -63,15 +64,15 @@ function FastestLapLeaderboard({ fastestLaps }) {
                 </td>
 
                 <td className="px-4 py-3 text-slate-300">
-                  {item.duration_sector_1?.toFixed?.(3) || "N/A"}
+                  {formatSeconds(item.duration_sector_1)}
                 </td>
 
                 <td className="px-4 py-3 text-slate-300">
-                  {item.duration_sector_2?.toFixed?.(3) || "N/A"}
+                  {formatSeconds(item.duration_sector_2)}
                 </td>
 
                 <td className="px-4 py-3 text-slate-300">
-                  {item.duration_sector_3?.toFixed?.(3) || "N/A"}
+                  {formatSeconds(item.duration_sector_3)}
                 </td>
               </tr>
             ))}

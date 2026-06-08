@@ -1,5 +1,6 @@
 import SectionHeader from "../common/SectionHeader";
 import StatCard from "../cards/StatCard";
+import { formatTimeOnly } from "../../utils/formatters";
 
 function RaceControlPanel({
   raceControlData,
@@ -100,9 +101,7 @@ function RaceControlPanel({
                   className="border-b border-slate-800/70 transition hover:bg-slate-800/50"
                 >
                   <td className="px-4 py-3 text-slate-300">
-                    {message.date
-                      ? new Date(message.date).toLocaleTimeString()
-                      : "N/A"}
+                    {formatTimeOnly(message.date)}
                   </td>
 
                   <td className="px-4 py-3 text-slate-300">
