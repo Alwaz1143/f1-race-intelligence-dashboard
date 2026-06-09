@@ -2,6 +2,16 @@ import SectionHeader from "../common/SectionHeader";
 import StatCard from "../cards/StatCard";
 import { formatTimeOnly } from "../../utils/formatters";
 
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+  CartesianGrid,
+} from "recharts";
+
 function RaceControlPanel({
   raceControlData,
   raceControlMessages,
@@ -11,6 +21,13 @@ function RaceControlPanel({
   if (!raceControlData) {
     return null;
   }
+
+  const categoryChartData = Object.entries(raceControlCategoryCounts).map(
+    ([category, count]) => ({
+      category,
+      count,
+    })
+  );
 
   return (
     <section className="mt-6 rounded-2xl border border-slate-800 bg-slate-900/60 p-4 sm:p-6">
@@ -33,6 +50,58 @@ function RaceControlPanel({
           value={Object.keys(raceControlFlagCounts).length}
         />
       </div>
+
+      {categoryChartData.length > 0 && (
+        <div className="mt-5 rounded-2xl bg-slate-950 p-4 sm:p-5">
+          <div className="mb-4">
+            <h3 className="text-lg font-semibold text-slate-100">
+              Race Control Event Categories
+            </h3>
+
+            <p className="mt-1 text-sm text-slate-500">
+              Distribution of official race control messages by category.
+            </p>
+          </div>
+
+          <div className="h-[280px] w-full sm:h-[340px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={categoryChartData}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
+
+                <XAxis
+                  dataKey="category"
+                  stroke="#94a3b8"
+                  tick={{ fontSize: 12 }}
+                />
+
+                <YAxis
+                  stroke="#94a3b8"
+                  tick={{ fontSize: 12 }}
+                  allowDecimals={false}
+                />
+
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: "#020617",
+                    border: "1px solid #334155",
+                    borderRadius: "12px",
+                    color: "#e5e7eb",
+                  }}
+                  formatter={(value) => [value, "Events"]}
+                  labelFormatter={(label) => `Category: ${label}`}
+                />
+
+                <Bar
+                  dataKey="count"
+                  name="Events"
+                  fill="#facc15"
+                  radius={[8, 8, 0, 0]}
+                />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+      )}
 
       <div className="mt-5 grid gap-4 lg:grid-cols-2">
         <div className="rounded-xl bg-slate-950 p-4">
