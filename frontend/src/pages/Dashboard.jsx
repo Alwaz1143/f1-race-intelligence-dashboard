@@ -24,7 +24,8 @@ import { useRaceControl } from "../hooks/useRaceControl";
 import { useDriverComparison } from "../hooks/useDriverComparison";
 
 
-
+import SkeletonCardGrid from "../components/common/SkeletonCardGrid";
+import TableSkeleton from "../components/common/TableSkeleton";
 
 const availableYears = [2023, 2024, 2025];
 
@@ -236,9 +237,7 @@ function Dashboard() {
         <SessionDetails selectedSession={selectedSession} />
         {!selectedSessionKey && <EmptyDashboardState />}
 
-        {selectedSessionKey && isOverviewLoading && (
-          <LoadingState message="Loading session overview..." />
-        )}
+        {selectedSessionKey && isOverviewLoading && <SkeletonCardGrid cards={6} />}
 
         {selectedSessionKey && isOverviewError && (
           <ErrorState message="Failed to load session overview"
@@ -249,7 +248,11 @@ function Dashboard() {
         <SessionOverview overviewData={overviewData} />
 
         {selectedSessionKey && isFastestLapsLoading && (
-          <LoadingState message="Loading fastest lap leaderboard..." />
+          <TableSkeleton
+            title="Loading fastest lap leaderboard..."
+            rows={8}
+            columns={8}
+          />
         )}
 
         {selectedSessionKey && isFastestLapsError && (
@@ -260,9 +263,7 @@ function Dashboard() {
 
         <FastestLapLeaderboard fastestLaps={fastestLaps} />
 
-        {selectedSessionKey && isDriversLoading && (
-          <LoadingState message="Loading drivers..." />
-        )}
+        {selectedSessionKey && isDriversLoading && <SkeletonCardGrid cards={6} />}
 
         {selectedSessionKey && isDriversError && (
           <ErrorState message="Failed to load drivers"
@@ -291,7 +292,11 @@ function Dashboard() {
 
 
         {selectedSessionKey && isRaceControlLoading && (
-          <LoadingState message="Loading race control messages..." />
+          <TableSkeleton
+            title="Loading race control messages..."
+            rows={8}
+            columns={6}
+          />
         )}
 
         {selectedSessionKey && isRaceControlError && (

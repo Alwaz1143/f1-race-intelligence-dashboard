@@ -10,10 +10,11 @@ import {
 } from "recharts";
 
 import SectionHeader from "../common/SectionHeader";
-import LoadingState from "../common/LoadingState";
 import ErrorState from "../common/ErrorState";
 
 import { formatSecondsWithUnit } from "../../utils/formatters";
+
+import ChartSkeleton from "../common/ChartSkeleton";
 
 function DriverComparisonPanel({
   drivers,
@@ -89,7 +90,7 @@ function DriverComparisonPanel({
       )}
 
       {isComparisonLoading && (
-        <LoadingState message="Loading driver comparison..." />
+        <ChartSkeleton title="Loading driver comparison chart and lap statistics..." />
       )}
 
       {isComparisonError && (
