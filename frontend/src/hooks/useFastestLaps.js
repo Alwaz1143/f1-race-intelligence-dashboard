@@ -8,5 +8,6 @@ export const useFastestLaps = (sessionKey) => {
     queryFn: () => getFastestLaps(sessionKey),
     enabled: Boolean(sessionKey),
     staleTime: 1000 * 60 * 10,
+    retry: 1,
   });
 };

@@ -8,5 +8,6 @@ export const useSessions = (meetingKey) => {
     queryFn: () => getSessions(meetingKey),
     enabled: Boolean(meetingKey),
     staleTime: 1000 * 60 * 10,
+    retry: 1,
   });
 };

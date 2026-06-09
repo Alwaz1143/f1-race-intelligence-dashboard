@@ -8,5 +8,6 @@ export const useRaces = (year) => {
     queryFn: () => getRaces(year),
     enabled: Boolean(year),
     staleTime: 1000 * 60 * 10,
+    retry: 1,
   });
 };

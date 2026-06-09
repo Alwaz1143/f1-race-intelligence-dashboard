@@ -26,6 +26,7 @@ function DriverComparisonPanel({
   isComparisonLoading,
   isComparisonError,
   comparisonError,
+  onRetryComparison,
 }) {
   if (!drivers || drivers.length === 0) {
     return null;
@@ -92,7 +93,11 @@ function DriverComparisonPanel({
       )}
 
       {isComparisonError && (
-        <ErrorState message="Failed to compare drivers" error={comparisonError} />
+        <ErrorState
+          message="Failed to compare drivers"
+          error={comparisonError}
+          onRetry={onRetryComparison}
+        />
       )}
 
       {comparisonData && (

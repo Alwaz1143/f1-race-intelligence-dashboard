@@ -45,6 +45,7 @@ function Dashboard() {
     isLoading: isRacesLoading,
     isError: isRacesError,
     error: racesError,
+    refetch: refetchRaces,
   } = useRaces(year);
 
   const {
@@ -52,6 +53,7 @@ function Dashboard() {
     isLoading: isSessionsLoading,
     isError: isSessionsError,
     error: sessionsError,
+    refetch: refetchSessions,
   } = useSessions(selectedMeetingKey);
 
   const {
@@ -59,6 +61,7 @@ function Dashboard() {
     isLoading: isOverviewLoading,
     isError: isOverviewError,
     error: overviewError,
+    refetch: refetchOverview,
   } = useSessionOverview(selectedSessionKey);
 
   const {
@@ -66,6 +69,7 @@ function Dashboard() {
     isLoading: isFastestLapsLoading,
     isError: isFastestLapsError,
     error: fastestLapsError,
+    refetch: refetchFastestLaps,
   } = useFastestLaps(selectedSessionKey);
 
   const {
@@ -73,6 +77,7 @@ function Dashboard() {
     isLoading: isDriversLoading,
     isError: isDriversError,
     error: driversError,
+    refetch: refetchDrivers,
   } = useDrivers(selectedSessionKey);
 
   const {
@@ -80,6 +85,7 @@ function Dashboard() {
     isLoading: isRaceControlLoading,
     isError: isRaceControlError,
     error: raceControlError,
+    refetch: refetchRaceControl,
   } = useRaceControl(selectedSessionKey);
 
   const {
@@ -87,6 +93,7 @@ function Dashboard() {
     isLoading: isComparisonLoading,
     isError: isComparisonError,
     error: comparisonError,
+    refetch: refetchComparison,
   } = useDriverComparison(selectedSessionKey, selectedDriver1, selectedDriver2);
 
   const comparisonChartData =
@@ -199,7 +206,11 @@ function Dashboard() {
         )}
 
         {isRacesError && (
-          <ErrorState message="Failed to load races" error={racesError} />
+          <ErrorState
+            message="Failed to load races"
+            error={racesError}
+            onRetry={refetchRaces}
+          />
         )}
 
         {!isRacesLoading && !isRacesError && races.length > 0 && (
@@ -213,7 +224,11 @@ function Dashboard() {
         )}
 
         {selectedMeetingKey && isSessionsError && (
-          <ErrorState message="Failed to load sessions" error={sessionsError} />
+          <ErrorState
+            message="Failed to load sessions"
+            error={sessionsError}
+            onRetry={refetchSessions}
+          />
         )}
 
         <RaceDetails selectedRace={selectedRace} />
@@ -226,7 +241,9 @@ function Dashboard() {
         )}
 
         {selectedSessionKey && isOverviewError && (
-          <ErrorState message="Failed to load session overview" error={overviewError} />
+          <ErrorState message="Failed to load session overview"
+            error={overviewError}
+            onRetry={refetchOverview} />
         )}
 
         <SessionOverview overviewData={overviewData} />
@@ -236,7 +253,9 @@ function Dashboard() {
         )}
 
         {selectedSessionKey && isFastestLapsError && (
-          <ErrorState message="Failed to load fastest laps" error={fastestLapsError} />
+          <ErrorState message="Failed to load fastest laps"
+            error={fastestLapsError}
+            onRetry={refetchFastestLaps} />
         )}
 
         <FastestLapLeaderboard fastestLaps={fastestLaps} />
@@ -246,7 +265,9 @@ function Dashboard() {
         )}
 
         {selectedSessionKey && isDriversError && (
-          <ErrorState message="Failed to load drivers" error={driversError} />
+          <ErrorState message="Failed to load drivers"
+            error={driversError}
+            onRetry={refetchDrivers} />
         )}
 
         <DriverList
@@ -265,6 +286,7 @@ function Dashboard() {
           isComparisonLoading={isComparisonLoading}
           isComparisonError={isComparisonError}
           comparisonError={comparisonError}
+          onRetryComparison={refetchComparison}
         />
 
 
@@ -276,6 +298,7 @@ function Dashboard() {
           <ErrorState
             message="Failed to load race control messages"
             error={raceControlError}
+            onRetry={refetchRaceControl}
           />
         )}
 

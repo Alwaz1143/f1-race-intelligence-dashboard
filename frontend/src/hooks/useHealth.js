@@ -7,5 +7,6 @@ export const useHealth = () => {
     queryKey: ["health"],
     queryFn: getHealth,
     staleTime: 1000 * 60,
+    retry: 1,
   });
 };
