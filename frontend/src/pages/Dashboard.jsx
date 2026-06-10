@@ -1,4 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useSearchParams } from "react-router";
+
 
 // import SectionHeader from "../components/common/SectionHeader";
 // import StatCard from "../components/cards/StatCard";
@@ -30,13 +32,37 @@ import TableSkeleton from "../components/common/TableSkeleton";
 
 const availableYears = [2023, 2024, 2025];
 
+const VALID_DASHBOARD_TABS = [
+  "fastest-laps",
+  "drivers",
+  "compare",
+  "race-control",
+];
+
 function Dashboard() {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [year, setYear] = useState(2024);
   const [selectedMeetingKey, setSelectedMeetingKey] = useState("");
   const [selectedSessionKey, setSelectedSessionKey] = useState("");
-  const [activeTab, setActiveTab] = useState("fastest-laps");
   const [selectedDriver1, setSelectedDriver1] = useState("");
   const [selectedDriver2, setSelectedDriver2] = useState("");
+
+  const [activeTab, setActiveTab] = useState(() => {
+    const tabFromUrl = searchParams.get("tab");
+
+    return VALID_DASHBOARD_TABS.includes(tabFromUrl)
+      ? tabFromUrl
+      : "fastest-laps";
+  });
+
+  useEffect(() => {
+    const tabFromUrl = searchParams.get("tab");
+
+    if (VALID_DASHBOARD_TABS.includes(tabFromUrl)) {
+      setActiveTab(tabFromUrl);
+    }
+  }, [searchParams]);
+
   const {
     data: healthData,
     isLoading: isHealthLoading,
@@ -152,8 +178,21 @@ function Dashboard() {
     setSelectedDriver2("");
 
     if (sessionKey) {
-      setActiveTab("fastest-laps");
+      handleTabChange("fastest-laps");
     }
+  };
+
+  const handleTabChange = (tabId) => {
+    if (!VALID_DASHBOARD_TABS.includes(tabId)) {
+      return;
+    }
+
+    setActiveTab(tabId);
+
+    const nextParams = new URLSearchParams(searchParams);
+    nextParams.set("tab", tabId);
+
+    setSearchParams(nextParams);
   };
 
   return (
@@ -256,7 +295,7 @@ function Dashboard() {
         <SessionOverview overviewData={overviewData} />
 
         {selectedSessionKey && (
-          <DashboardTabs activeTab={activeTab} onTabChange={setActiveTab} />
+          <DashboardTabs activeTab={activeTab} onTabChange={handleTabChange} />
         )}
 
         {selectedSessionKey && activeTab === "fastest-laps" && (
