@@ -1,5 +1,8 @@
 import SectionHeader from "../common/SectionHeader";
-import { formatSeconds, formatSecondsWithUnit } from "../../utils/formatters";
+import {
+  formatDurationTime,
+  formatSecondsWithUnit,
+} from "../../utils/formatters";
 
 import {
   BarChart,
@@ -135,15 +138,15 @@ function FastestLapLeaderboard({ fastestLaps }) {
                 </td>
 
                 <td className="px-4 py-3 text-slate-300">
-                  {formatSeconds(item.duration_sector_1)}
+                  {formatDurationTime(item.duration_sector_1)}
                 </td>
 
                 <td className="px-4 py-3 text-slate-300">
-                  {formatSeconds(item.duration_sector_2)}
+                  {formatDurationTime(item.duration_sector_2)}
                 </td>
 
                 <td className="px-4 py-3 text-slate-300">
-                  {formatSeconds(item.duration_sector_3)}
+                  {formatDurationTime(item.duration_sector_3)}
                 </td>
               </tr>
             ))}
