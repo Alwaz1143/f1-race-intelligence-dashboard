@@ -7,7 +7,8 @@ export const useRaceControl = (sessionKey) => {
     queryKey: ["race-control", sessionKey],
     queryFn: () => getRaceControl(sessionKey),
     enabled: Boolean(sessionKey),
-    staleTime: 1000 * 60 * 10,
+    staleTime: 5 * 60 * 1000,
+    refetchOnWindowFocus: false,
     retry: 1,
   });
 };

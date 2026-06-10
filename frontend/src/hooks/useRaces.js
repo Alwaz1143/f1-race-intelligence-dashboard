@@ -7,7 +7,8 @@ export const useRaces = (year) => {
     queryKey: ["races", year],
     queryFn: () => getRaces(year),
     enabled: Boolean(year),
-    staleTime: 1000 * 60 * 10,
+    staleTime: 5 * 60 * 1000,
+    refetchOnWindowFocus: false,
     retry: 1,
   });
 };

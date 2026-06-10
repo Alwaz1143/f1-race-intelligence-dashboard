@@ -13,6 +13,7 @@ import SessionOverview from "../components/overview/SessionOverview";
 import RaceDetails from "../components/overview/RaceDetails";
 import SessionDetails from "../components/overview/SessionDetails";
 import EmptyDashboardState from "../components/common/EmptyDashboardState";
+import DashboardTabs from "../components/navigation/DashboardTabs";
 
 import { useHealth } from "../hooks/useHealth";
 import { useRaces } from "../hooks/useRaces";
@@ -33,6 +34,7 @@ function Dashboard() {
   const [year, setYear] = useState(2024);
   const [selectedMeetingKey, setSelectedMeetingKey] = useState("");
   const [selectedSessionKey, setSelectedSessionKey] = useState("");
+  const [activeTab, setActiveTab] = useState("fastest-laps");
   const [selectedDriver1, setSelectedDriver1] = useState("");
   const [selectedDriver2, setSelectedDriver2] = useState("");
   const {
@@ -143,9 +145,15 @@ function Dashboard() {
   };
 
   const handleSessionChange = (event) => {
-    setSelectedSessionKey(event.target.value);
+    const sessionKey = event.target.value;
+
+    setSelectedSessionKey(sessionKey);
     setSelectedDriver1("");
     setSelectedDriver2("");
+
+    if (sessionKey) {
+      setActiveTab("fastest-laps");
+    }
   };
 
   return (
@@ -247,72 +255,90 @@ function Dashboard() {
 
         <SessionOverview overviewData={overviewData} />
 
-        {selectedSessionKey && isFastestLapsLoading && (
-          <TableSkeleton
-            title="Loading fastest lap leaderboard..."
-            rows={8}
-            columns={8}
+        {selectedSessionKey && (
+          <DashboardTabs activeTab={activeTab} onTabChange={setActiveTab} />
+        )}
+
+        {selectedSessionKey && activeTab === "fastest-laps" && (
+          <>
+            {isFastestLapsLoading && (
+              <TableSkeleton
+                title="Loading fastest lap leaderboard..."
+                rows={8}
+                columns={8}
+              />
+            )}
+
+            {isFastestLapsError && (
+              <ErrorState
+                message="Failed to load fastest laps"
+                error={fastestLapsError}
+                onRetry={refetchFastestLaps}
+              />
+            )}
+
+            <FastestLapLeaderboard fastestLaps={fastestLaps} />
+          </>
+        )}
+
+        {selectedSessionKey && activeTab === "drivers" && (
+          <>
+            {isDriversLoading && <SkeletonCardGrid cards={6} />}
+
+            {isDriversError && (
+              <ErrorState
+                message="Failed to load drivers"
+                error={driversError}
+                onRetry={refetchDrivers}
+              />
+            )}
+
+            <DriverList drivers={drivers} driversCount={driversData?.count} />
+          </>
+        )}
+
+        {selectedSessionKey && activeTab === "compare" && (
+          <DriverComparisonPanel
+            drivers={drivers}
+            selectedDriver1={selectedDriver1}
+            selectedDriver2={selectedDriver2}
+            setSelectedDriver1={setSelectedDriver1}
+            setSelectedDriver2={setSelectedDriver2}
+            comparisonData={comparisonData}
+            comparisonChartData={comparisonChartData}
+            isComparisonLoading={isComparisonLoading}
+            isComparisonError={isComparisonError}
+            comparisonError={comparisonError}
+            onRetryComparison={refetchComparison}
           />
         )}
 
-        {selectedSessionKey && isFastestLapsError && (
-          <ErrorState message="Failed to load fastest laps"
-            error={fastestLapsError}
-            onRetry={refetchFastestLaps} />
+        {selectedSessionKey && activeTab === "race-control" && (
+          <>
+            {isRaceControlLoading && (
+              <TableSkeleton
+                title="Loading race control messages..."
+                rows={8}
+                columns={6}
+              />
+            )}
+
+            {isRaceControlError && (
+              <ErrorState
+                message="Failed to load race control messages"
+                error={raceControlError}
+                onRetry={refetchRaceControl}
+              />
+            )}
+
+            <RaceControlPanel
+              raceControlData={raceControlData}
+              raceControlMessages={raceControlMessages}
+              raceControlCategoryCounts={raceControlCategoryCounts}
+              raceControlFlagCounts={raceControlFlagCounts}
+            />
+          </>
         )}
-
-        <FastestLapLeaderboard fastestLaps={fastestLaps} />
-
-        {selectedSessionKey && isDriversLoading && <SkeletonCardGrid cards={6} />}
-
-        {selectedSessionKey && isDriversError && (
-          <ErrorState message="Failed to load drivers"
-            error={driversError}
-            onRetry={refetchDrivers} />
-        )}
-
-        <DriverList
-          drivers={drivers}
-          driversCount={driversData?.count}
-        />
-
-        <DriverComparisonPanel
-          drivers={drivers}
-          selectedDriver1={selectedDriver1}
-          selectedDriver2={selectedDriver2}
-          setSelectedDriver1={setSelectedDriver1}
-          setSelectedDriver2={setSelectedDriver2}
-          comparisonData={comparisonData}
-          comparisonChartData={comparisonChartData}
-          isComparisonLoading={isComparisonLoading}
-          isComparisonError={isComparisonError}
-          comparisonError={comparisonError}
-          onRetryComparison={refetchComparison}
-        />
-
-
-        {selectedSessionKey && isRaceControlLoading && (
-          <TableSkeleton
-            title="Loading race control messages..."
-            rows={8}
-            columns={6}
-          />
-        )}
-
-        {selectedSessionKey && isRaceControlError && (
-          <ErrorState
-            message="Failed to load race control messages"
-            error={raceControlError}
-            onRetry={refetchRaceControl}
-          />
-        )}
-
-        <RaceControlPanel
-          raceControlData={raceControlData}
-          raceControlMessages={raceControlMessages}
-          raceControlCategoryCounts={raceControlCategoryCounts}
-          raceControlFlagCounts={raceControlFlagCounts}
-        />
 
       </div>
     </main>

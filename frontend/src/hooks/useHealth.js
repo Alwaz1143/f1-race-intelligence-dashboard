@@ -6,7 +6,8 @@ export const useHealth = () => {
   return useQuery({
     queryKey: ["health"],
     queryFn: getHealth,
-    staleTime: 1000 * 60,
+    staleTime: 5 * 60 * 1000,
+    refetchOnWindowFocus: false,
     retry: 1,
   });
 };

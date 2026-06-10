@@ -7,7 +7,8 @@ export const useSessions = (meetingKey) => {
     queryKey: ["sessions", meetingKey],
     queryFn: () => getSessions(meetingKey),
     enabled: Boolean(meetingKey),
-    staleTime: 1000 * 60 * 10,
+    staleTime: 5 * 60 * 1000,
+    refetchOnWindowFocus: false,
     retry: 1,
   });
 };

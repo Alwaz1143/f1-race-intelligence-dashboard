@@ -7,7 +7,8 @@ export const useFastestLaps = (sessionKey) => {
     queryKey: ["fastest-laps", sessionKey],
     queryFn: () => getFastestLaps(sessionKey),
     enabled: Boolean(sessionKey),
-    staleTime: 1000 * 60 * 10,
+    staleTime: 5 * 60 * 1000,
+    refetchOnWindowFocus: false,
     retry: 1,
   });
 };
