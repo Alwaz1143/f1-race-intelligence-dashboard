@@ -75,3 +75,15 @@ Do not commit .env files.
 Do not commit frontend/dist.
 Backend CORS must allow the deployed frontend URL.
 Frontend API base URL must point to deployed backend /api.
+
+
+
+# Production URLs:
+
+## Backend: 
+```text
+https://f1-race-intelligence-api.onrender.com
+```
+
+## Frontend:
+Pending
