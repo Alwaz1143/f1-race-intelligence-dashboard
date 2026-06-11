@@ -1,5 +1,10 @@
 # F1 Race Intelligence Dashboard
 
+![Frontend](https://img.shields.io/badge/Frontend-React-blue)
+![Backend](https://img.shields.io/badge/Backend-FastAPI-green)
+![Deployment](https://img.shields.io/badge/Deployment-Vercel%20%2B%20Render-black)
+![Status](https://img.shields.io/badge/Status-MVP%20Deployed-success)
+
 A full-stack Formula 1 race analytics dashboard built with FastAPI, React, OpenF1 API, TanStack Query, Recharts, and caching.
 
 The project analyzes Formula 1 race sessions by showing race details, session overview metrics, fastest lap leaderboards, driver lists, driver comparison analytics, lap-time charts, and race control messages.
@@ -16,6 +21,63 @@ This project is built to demonstrate full-stack software development skills, inc
 - Frontend server-state management using TanStack Query
 - Data visualization using Recharts
 - Clean component-based UI architecture
+
+## Live Demo
+
+- Frontend: https://f1-race-intelligence-dashboard-beta.vercel.app
+- Backend API: https://f1-race-intelligence-api.onrender.com
+- API Docs: https://f1-race-intelligence-api.onrender.com/docs
+
+
+## Screenshots
+
+### Home Page
+
+![Home Page](./docs/screenshots/home-page.png)
+
+### Dashboard Overview
+
+![Dashboard Overview](./docs/screenshots/dashboard-overview.png)
+
+### Fastest Lap Analysis
+
+![Fastest Lap Analysis](./docs/screenshots/fastest-laps.png)
+
+### Session Drivers
+
+![Session Drivers](./docs/screenshots/session-drivers.png)
+
+### Driver Comparison
+
+![Driver Comparison](./docs/screenshots/compare-drivers.png)
+
+### Race Control Analysis
+
+![Race Control Analysis](./docs/screenshots/race-control.png)
+
+## Demo Flow
+
+1. Open the deployed frontend.
+2. Select an F1 season.
+3. Select a Grand Prix.
+4. Select a session such as Race or Qualifying.
+5. View the session overview cards.
+6. Explore fastest lap leaderboard and fastest lap chart.
+7. View all session drivers.
+8. Compare two drivers using lap-time analytics.
+9. View race control messages and category chart.
+10. Refresh or share the dashboard URL with selected filters and active tab preserved.
+
+## Feature Highlights
+
+- URL-driven dashboard filters for year, race, session, and active tab
+- Tab-based analytics sections to avoid one long dashboard page
+- TanStack Query caching to prevent unnecessary refetching
+- FastAPI backend service layer for clean analytics logic
+- In-memory cache with TTL for OpenF1 API responses
+- Recharts visualizations for lap-time and race-control analysis
+- Responsive UI with loading skeletons, empty states, and retryable errors
+
 
 ## Tech Stack
 
@@ -268,16 +330,17 @@ f1-race-intelligence-dashboard/
 
 ## Current Status
 
-The project currently has a working MVP-ready backend and frontend.
+The project is deployed and MVP-ready.
 
 Completed:
 
-- FastAPI backend setup
-- OpenF1 API integration
+- FastAPI backend deployed on Render
+- React frontend deployed on Vercel
+- Production CORS configured for deployed frontend domains
+- OpenF1 API integration working in production
 - Backend service-layer architecture
-- In-memory caching with TTL
 - Backend validation and error handling
-- React frontend setup
+- In-memory caching with TTL
 - Dashboard filters with URL query parameters
 - Tab-based dashboard navigation
 - Session overview cards
@@ -295,14 +358,19 @@ Completed:
 
 ## Planned Improvements
 
-- Deploy frontend and backend
-- Add screenshots and demo section
+- Add screenshots and demo GIF to README
 - Add Redis caching for production
 - Add AI-generated session summary
-- Add automated tests
+- Add automated backend tests
+- Add frontend component tests
 - Add more advanced race analytics
 - Improve accessibility
+- Add custom domain
     
+
+## MVP Result
+
+The deployed MVP is working end-to-end with a Vercel frontend, Render backend, OpenF1 API integration, analytics endpoints, production CORS configuration, responsive dashboard UI, chart visualizations, loading states, retry handling, and URL-driven dashboard filters.
 
 ## Disclaimer
 
