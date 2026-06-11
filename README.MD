@@ -212,6 +212,26 @@ Frontend runs at:
 http://localhost:5173
 ```
 
+## Deployment Plan
+
+The frontend will be deployed on Vercel and the backend will be deployed as a Python web service on Render.
+
+Production environment variables:
+
+Frontend:
+
+```env
+VITE_API_BASE_URL=https://your-render-backend-url.onrender.com/api
+```
+
+Backend:
+```env
+OPENF1_BASE_URL=https://api.openf1.org/v1
+FRONTEND_URL=https://your-vercel-frontend-url.vercel.app
+```
+
+
+
 ## Project Structure
 
 ```text
