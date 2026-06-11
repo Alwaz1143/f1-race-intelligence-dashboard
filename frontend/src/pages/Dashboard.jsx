@@ -40,12 +40,27 @@ const VALID_DASHBOARD_TABS = [
 ];
 
 function Dashboard() {
+
+
+
+
   const [searchParams, setSearchParams] = useSearchParams();
-  const [year, setYear] = useState(2024);
-  const [selectedMeetingKey, setSelectedMeetingKey] = useState("");
-  const [selectedSessionKey, setSelectedSessionKey] = useState("");
   const [selectedDriver1, setSelectedDriver1] = useState("");
   const [selectedDriver2, setSelectedDriver2] = useState("");
+  const yearFromUrl = Number(searchParams.get("year"));
+
+
+  const [year, setYear] = useState(
+    Number.isFinite(yearFromUrl) && yearFromUrl > 0 ? yearFromUrl : 2024
+  );
+
+  const [selectedMeetingKey, setSelectedMeetingKey] = useState(
+    searchParams.get("meeting_key") || ""
+  );
+
+  const [selectedSessionKey, setSelectedSessionKey] = useState(
+    searchParams.get("session_key") || ""
+  );
 
   const [activeTab, setActiveTab] = useState(() => {
     const tabFromUrl = searchParams.get("tab");
@@ -56,12 +71,27 @@ function Dashboard() {
   });
 
   useEffect(() => {
+    const nextYear = Number(searchParams.get("year"));
+    const nextMeetingKey = searchParams.get("meeting_key") || "";
+    const nextSessionKey = searchParams.get("session_key") || "";
     const tabFromUrl = searchParams.get("tab");
+
+    if (Number.isFinite(nextYear) && nextYear > 0) {
+      setYear(nextYear);
+    }
+
+    setSelectedMeetingKey(nextMeetingKey);
+    setSelectedSessionKey(nextSessionKey);
 
     if (VALID_DASHBOARD_TABS.includes(tabFromUrl)) {
       setActiveTab(tabFromUrl);
     }
   }, [searchParams]);
+
+  useEffect(() => {
+    setSelectedDriver1("");
+    setSelectedDriver2("");
+  }, [selectedSessionKey]);
 
   const {
     data: healthData,
@@ -156,18 +186,48 @@ function Dashboard() {
   );
 
   const handleYearChange = (event) => {
-    setYear(Number(event.target.value));
+    const nextYear = Number(event.target.value);
+
+    setYear(nextYear);
     setSelectedMeetingKey("");
     setSelectedSessionKey("");
     setSelectedDriver1("");
     setSelectedDriver2("");
+    setActiveTab("fastest-laps");
+
+    const nextParams = new URLSearchParams(searchParams);
+
+    nextParams.set("year", String(nextYear));
+    nextParams.delete("meeting_key");
+    nextParams.delete("session_key");
+    nextParams.set("tab", "fastest-laps");
+
+    setSearchParams(nextParams);
   };
 
   const handleRaceChange = (event) => {
-    setSelectedMeetingKey(event.target.value);
+    const meetingKey = event.target.value;
+
+    setSelectedMeetingKey(meetingKey);
     setSelectedSessionKey("");
     setSelectedDriver1("");
     setSelectedDriver2("");
+    setActiveTab("fastest-laps");
+
+    const nextParams = new URLSearchParams(searchParams);
+
+    nextParams.set("year", String(year));
+
+    if (meetingKey) {
+      nextParams.set("meeting_key", meetingKey);
+    } else {
+      nextParams.delete("meeting_key");
+    }
+
+    nextParams.delete("session_key");
+    nextParams.set("tab", "fastest-laps");
+
+    setSearchParams(nextParams);
   };
 
   const handleSessionChange = (event) => {
@@ -176,10 +236,25 @@ function Dashboard() {
     setSelectedSessionKey(sessionKey);
     setSelectedDriver1("");
     setSelectedDriver2("");
+    setActiveTab("fastest-laps");
+
+    const nextParams = new URLSearchParams(searchParams);
+
+    nextParams.set("year", String(year));
+
+    if (selectedMeetingKey) {
+      nextParams.set("meeting_key", String(selectedMeetingKey));
+    }
 
     if (sessionKey) {
-      handleTabChange("fastest-laps");
+      nextParams.set("session_key", sessionKey);
+    } else {
+      nextParams.delete("session_key");
     }
+
+    nextParams.set("tab", "fastest-laps");
+
+    setSearchParams(nextParams);
   };
 
   const handleTabChange = (tabId) => {
