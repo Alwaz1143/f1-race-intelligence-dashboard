@@ -248,58 +248,40 @@ f1-race-intelligence-dashboard/
 
 ## Current Status
 
-The project currently has a working backend and frontend MVP.
+The project currently has a working MVP-ready backend and frontend.
 
 Completed:
 
 - FastAPI backend setup
-    
 - OpenF1 API integration
-    
-- Backend service layer
-    
-- In-memory caching
-    
-- Analytics endpoints
-    
+- Backend service-layer architecture
+- In-memory caching with TTL
+- Backend validation and error handling
 - React frontend setup
-    
-- Dashboard filters
-    
+- Dashboard filters with URL query parameters
+- Tab-based dashboard navigation
 - Session overview cards
-    
 - Fastest lap leaderboard
-    
+- Fastest lap comparison chart
 - Driver list
-    
-- Driver comparison UI
-    
+- Driver comparison analytics
 - Lap-time comparison chart
-    
-- Race control section
-    
-- Reusable frontend components
+- Race control messages
+- Race control category chart
+- Loading skeletons
+- Error states with retry actions
+- Responsive UI polish
     
 
 ## Planned Improvements
 
-- Add Redis caching
-    
+- Deploy frontend and backend
+- Add screenshots and demo section
+- Add Redis caching for production
 - Add AI-generated session summary
-    
-- Add more charts using Recharts
-    
-- Add frontend deployment
-    
-- Add backend deployment
-    
-- Improve mobile responsiveness
-    
-- Add test cases
-    
-- Add screenshots to README
-    
-- Add production environment configuration
+- Add automated tests
+- Add more advanced race analytics
+- Improve accessibility
     
 
 ## Disclaimer
