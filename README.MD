@@ -139,6 +139,8 @@ This project is built to demonstrate full-stack software development skills, inc
 - Backend validation and error handling
 - In-memory caching layer
 - Custom 404 page and React error boundary for safer production UI
+- Redis caching layer
+- Automated frontend and backend test
 
 ## Backend API Endpoints
 
@@ -357,15 +359,14 @@ Completed:
 - Loading skeletons
 - Error states with retry actions
 - Responsive UI polish
+- Redis caching deployed
+- Automated frontend and backend test deployed
     
 
 ## Planned Improvements
 
 - Add screenshots and demo GIF to README
-- Add Redis caching for production
 - Add AI-generated session summary
-- Add automated backend tests
-- Add frontend component tests
 - Add more advanced race analytics
 - Improve accessibility
 - Add custom domain
