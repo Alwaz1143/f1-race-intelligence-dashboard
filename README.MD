@@ -5,6 +5,8 @@
 ![Deployment](https://img.shields.io/badge/Deployment-Vercel%20%2B%20Render-black)
 ![Status](https://img.shields.io/badge/Status-MVP%20Deployed-success)
 
+![CI](https://github.com/Alwaz1143/f1-race-intelligence-dashboard/actions/workflows/ci.yml/badge.svg)
+
 A full-stack Formula 1 race analytics dashboard built with FastAPI, React, OpenF1 API, TanStack Query, Recharts, and caching.
 
 The project analyzes Formula 1 race sessions by showing race details, session overview metrics, fastest lap leaderboards, driver lists, driver comparison analytics, lap-time charts, and race control messages.
