@@ -1,3 +1,5 @@
+import asyncio
+
 import httpx
 from fastapi import HTTPException
 
@@ -20,12 +22,23 @@ class OpenF1Client:
 
         return f"openf1:{endpoint}:{params_string}"
 
+    def should_retry_status(self, status_code: int) -> bool:
+        return status_code in {408, 429, 500, 502, 503, 504}
+
+    def should_cache_response(self, endpoint: str, data):
+        if endpoint == "laps" and data == []:
+            return False
+
+        return True
+
     async def get(
         self,
         endpoint: str,
         params: dict | None = None,
         use_cache: bool = True,
-        ttl_seconds: int = 300
+        ttl_seconds: int = 300,
+        max_retries: int = 3,
+        timeout_seconds: float = 25.0,
     ):
         url = f"{self.base_url}/{endpoint}"
         cache_key = self.build_cache_key(endpoint, params)
@@ -36,31 +49,55 @@ class OpenF1Client:
             if cached_data is not None:
                 return cached_data
 
-        try:
-            async with httpx.AsyncClient(timeout=10.0) as client:
-                response = await client.get(url, params=params)
-                response.raise_for_status()
-                data = response.json()
+        last_error = None
 
-                if use_cache:
-                    await cache.set(cache_key, data, ttl_seconds)
+        for attempt in range(max_retries):
+            try:
+                async with httpx.AsyncClient(timeout=timeout_seconds) as client:
+                    response = await client.get(url, params=params)
+                    response.raise_for_status()
+                    data = response.json()
 
-                return data
+                    if use_cache and self.should_cache_response(endpoint, data):
+                        await cache.set(cache_key, data, ttl_seconds)
 
-        except httpx.HTTPStatusError as e:
-            if e.response.status_code == 404:
-                return []
+                    return data
 
-            raise HTTPException(
-                status_code=e.response.status_code,
-                detail=f"OpenF1 API error: {e.response.text}"
-            )
+            except httpx.HTTPStatusError as e:
+                last_error = e
+                status_code = e.response.status_code
 
-        except httpx.RequestError:
-            raise HTTPException(
-                status_code=503,
-                detail="Could not connect to OpenF1 API"
-            )
+                if status_code == 404:
+                    return []
+
+                if (
+                    self.should_retry_status(status_code)
+                    and attempt < max_retries - 1
+                ):
+                    await asyncio.sleep(1.5 * (attempt + 1))
+                    continue
+
+                raise HTTPException(
+                    status_code=status_code,
+                    detail=f"OpenF1 API error: {e.response.text}",
+                ) from e
+
+            except httpx.RequestError as e:
+                last_error = e
+
+                if attempt < max_retries - 1:
+                    await asyncio.sleep(1.5 * (attempt + 1))
+                    continue
+
+                raise HTTPException(
+                    status_code=503,
+                    detail="Could not connect to OpenF1 API",
+                ) from e
+
+        raise HTTPException(
+            status_code=503,
+            detail=f"OpenF1 API request failed after retries: {str(last_error)}",
+        )
 
 
 openf1_client = OpenF1Client()
