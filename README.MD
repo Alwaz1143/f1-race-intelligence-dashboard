@@ -138,6 +138,7 @@ This project is built to demonstrate full-stack software development skills, inc
 - Backend service-layer architecture
 - Backend validation and error handling
 - In-memory caching layer
+- Custom 404 page and React error boundary for safer production UI
 
 ## Backend API Endpoints
 

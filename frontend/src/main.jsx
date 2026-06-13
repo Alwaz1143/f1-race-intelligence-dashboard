@@ -6,14 +6,18 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import "./index.css";
 import App from "./App.jsx";
 
+import ErrorBoundary from "./components/common/ErrorBoundary";
+
 const queryClient = new QueryClient();
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
-    <QueryClientProvider client={queryClient}>
+    <ErrorBoundary>
       <BrowserRouter>
-        <App />
+        <QueryClientProvider client={queryClient}>
+          <App />
+        </QueryClientProvider>
       </BrowserRouter>
-    </QueryClientProvider>
+    </ErrorBoundary>
   </StrictMode>
 );
