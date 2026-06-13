@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Response
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.routes import (
@@ -36,7 +36,9 @@ def root():
         "docs": "/docs",
         "health": "/api/health"
     }
-
+@app.head("/")
+async def root_head():
+    return Response(status_code=200)
 
 app.include_router(health.router, prefix="/api", tags=["Health"])
 app.include_router(races.router, prefix="/api", tags=["Races"])
