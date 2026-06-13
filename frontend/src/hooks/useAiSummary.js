@@ -11,7 +11,7 @@ function shouldRetryRequest(failureCount, error) {
 
   const retryableStatuses = [408, 429, 500, 502, 503, 504];
 
-  return retryableStatuses.includes(status) && failureCount < 3;
+  return retryableStatuses.includes(status) && failureCount < 2;
 }
 
 export function useAiSummary(sessionKey, enabled = true) {
@@ -21,7 +21,7 @@ export function useAiSummary(sessionKey, enabled = true) {
     enabled: Boolean(sessionKey) && enabled,
     retry: shouldRetryRequest,
     retryDelay: (attemptIndex) =>
-      Math.min(1000 * 2 ** attemptIndex, 8000),
+      Math.min(1000 * 2 ** attemptIndex, 5000),
     staleTime: 10 * 60 * 1000,
     refetchOnWindowFocus: false,
   });

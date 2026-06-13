@@ -1,5 +1,17 @@
 import axiosClient from "./axiosClient";
 
+export const getDriverComparison = async (sessionKey, driver1, driver2) => {
+  const response = await axiosClient.get("/analytics/compare-drivers", {
+    params: {
+      session_key: sessionKey,
+      driver1,
+      driver2,
+    },
+  });
+
+  return response.data;
+};
+
 export const getHealth = async () => {
   const response = await axiosClient.get("/health");
   return response.data;
@@ -84,3 +96,4 @@ export const getRaceClassification = async (year, round) => {
 
   return response.data;
 };
+

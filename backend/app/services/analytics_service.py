@@ -198,8 +198,8 @@ async def get_driver_laps_with_fallback(
         },
         use_cache=False,
         ttl_seconds=60,
-        max_retries=3,
-        timeout_seconds=25.0,
+        max_retries=2,
+        timeout_seconds=12.0,
     )
 
     return filter_valid_driver_laps(fresh_driver_laps, driver_number)

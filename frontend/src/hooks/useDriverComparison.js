@@ -11,7 +11,7 @@ function shouldRetryRequest(failureCount, error) {
 
   const retryableStatuses = [408, 429, 500, 502, 503, 504];
 
-  return retryableStatuses.includes(status) && failureCount < 3;
+  return retryableStatuses.includes(status) && failureCount < 2;
 }
 
 export function useDriverComparison(
@@ -31,7 +31,7 @@ export function useDriverComparison(
       enabled,
     retry: shouldRetryRequest,
     retryDelay: (attemptIndex) =>
-      Math.min(1000 * 2 ** attemptIndex, 8000),
+      Math.min(700 * 2 ** attemptIndex, 4000),
     staleTime: 5 * 60 * 1000,
     refetchOnWindowFocus: false,
   });

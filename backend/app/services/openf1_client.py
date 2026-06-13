@@ -16,9 +16,7 @@ class OpenF1Client:
             return f"openf1:{endpoint}"
 
         sorted_params = sorted(params.items())
-        params_string = "&".join(
-            f"{key}={value}" for key, value in sorted_params
-        )
+        params_string = "&".join(f"{key}={value}" for key, value in sorted_params)
 
         return f"openf1:{endpoint}:{params_string}"
 
@@ -36,9 +34,9 @@ class OpenF1Client:
         endpoint: str,
         params: dict | None = None,
         use_cache: bool = True,
-        ttl_seconds: int = 300,
-        max_retries: int = 3,
-        timeout_seconds: float = 25.0,
+        ttl_seconds: int = 3600,
+        max_retries: int = 2,
+        timeout_seconds: float = 15.0,
     ):
         url = f"{self.base_url}/{endpoint}"
         cache_key = self.build_cache_key(endpoint, params)
@@ -70,11 +68,8 @@ class OpenF1Client:
                 if status_code == 404:
                     return []
 
-                if (
-                    self.should_retry_status(status_code)
-                    and attempt < max_retries - 1
-                ):
-                    await asyncio.sleep(1.5 * (attempt + 1))
+                if self.should_retry_status(status_code) and attempt < max_retries - 1:
+                    await asyncio.sleep(0.75 * (attempt + 1))
                     continue
 
                 raise HTTPException(
@@ -86,7 +81,7 @@ class OpenF1Client:
                 last_error = e
 
                 if attempt < max_retries - 1:
-                    await asyncio.sleep(1.5 * (attempt + 1))
+                    await asyncio.sleep(0.75 * (attempt + 1))
                     continue
 
                 raise HTTPException(
