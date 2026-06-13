@@ -12,6 +12,7 @@ from app.api.routes import (
     cache,
     ai_summary
 )
+from app.api.routes.results import router as results_router
 from app.core.config import settings
 
 app = FastAPI(
@@ -50,3 +51,4 @@ app.include_router(race_control.router, prefix="/api", tags=["Race Control"])
 app.include_router(analytics.router, prefix="/api", tags=["Analytics"])
 app.include_router(cache.router, prefix="/api", tags=["Cache"])
 app.include_router(ai_summary.router, prefix="/api", tags=["AI Summary"])
+app.include_router(results_router, prefix="/api")

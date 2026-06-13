@@ -10,7 +10,10 @@ class Settings:
         "OPENF1_BASE_URL",
         "https://api.openf1.org/v1"
     )
-
+    JOLPICA_BASE_URL: str = os.getenv(
+        "JOLPICA_BASE_URL",
+        "https://api.jolpi.ca/ergast/f1"
+    )
     FRONTEND_URLS: str = os.getenv(
         "FRONTEND_URLS",
         os.getenv("FRONTEND_URL", "http://localhost:5173")
