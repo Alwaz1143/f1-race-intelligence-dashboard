@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router";
 
 
@@ -23,7 +23,8 @@ import { useFastestLaps } from "../hooks/useFastestLaps";
 import { useDrivers } from "../hooks/useDrivers";
 import { useRaceControl } from "../hooks/useRaceControl";
 import { useDriverComparison } from "../hooks/useDriverComparison";
-
+import RaceClassificationTable from "../components/results/RaceClassificationTable";
+import { useRaceClassification } from "../hooks/useRaceClassification";
 
 import SkeletonCardGrid from "../components/common/SkeletonCardGrid";
 import TableSkeleton from "../components/common/TableSkeleton";
@@ -35,8 +36,8 @@ const availableYears = [2023, 2024, 2025];
 
 const VALID_DASHBOARD_TABS = [
   "overview",
+  "classification",
   "fastest-laps",
-  "drivers",
   "compare",
   "race-control",
 ];
@@ -174,6 +175,8 @@ function Dashboard() {
     refetch: refetchAiSummary,
   } = useAiSummary(selectedSessionKey, activeTab === "overview");
 
+
+
   const raceControlMessages = raceControlData?.messages || [];
   const raceControlCategoryCounts = raceControlData?.event_counts?.by_category || {};
   const raceControlFlagCounts = raceControlData?.event_counts?.by_flag || {};
@@ -194,6 +197,51 @@ function Dashboard() {
   const selectedSession = sessions.find(
     (session) => String(session.session_key) === String(selectedSessionKey)
   );
+
+const selectedRound = useMemo(() => {
+  if (!selectedMeetingKey || !races.length) {
+    return null;
+  }
+
+  const championshipRaces = races.filter((race) => {
+    const raceText = `${race.meeting_name || ""} ${
+      race.meeting_official_name || ""
+    }`.toLowerCase();
+
+    return !raceText.includes("testing");
+  });
+
+  const sortedRaces = [...championshipRaces].sort((a, b) => {
+    const dateA = new Date(a.date_start || a.date || 0).getTime();
+    const dateB = new Date(b.date_start || b.date || 0).getTime();
+
+    return dateA - dateB;
+  });
+
+  const raceIndex = sortedRaces.findIndex(
+    (race) => String(race.meeting_key) === String(selectedMeetingKey)
+  );
+
+  return raceIndex >= 0 ? raceIndex + 1 : null;
+}, [races, selectedMeetingKey]);
+
+
+
+  const isRaceSession =
+    selectedSession?.session_name?.toLowerCase() === "race";
+
+  const {
+    data: raceClassificationData,
+    isLoading: isRaceClassificationLoading,
+    isError: isRaceClassificationError,
+    error: raceClassificationError,
+    refetch: refetchRaceClassification,
+  } = useRaceClassification(
+    year,
+    selectedRound,
+    activeTab === "classification" && isRaceSession
+  );
+
 
   const handleYearChange = (event) => {
     const nextYear = Number(event.target.value);
@@ -390,6 +438,32 @@ function Dashboard() {
           </>
         )}
 
+        {selectedSessionKey && activeTab === "classification" && (
+          <>
+            {isRaceSession && isRaceClassificationLoading && (
+              <TableSkeleton
+                title="Loading race classification..."
+                rows={10}
+                columns={7}
+              />
+            )}
+
+            {isRaceSession && isRaceClassificationError && (
+              <ErrorState
+                message="Failed to load race classification"
+                error={raceClassificationError}
+                onRetry={refetchRaceClassification}
+              />
+            )}
+
+            <RaceClassificationTable
+              classificationData={raceClassificationData}
+              selectedRound={selectedRound}
+              isRaceSession={isRaceSession}
+            />
+          </>
+        )}
+
         {selectedSessionKey && activeTab === "fastest-laps" && (
           <>
             {isFastestLapsLoading && (
@@ -412,21 +486,6 @@ function Dashboard() {
           </>
         )}
 
-        {selectedSessionKey && activeTab === "drivers" && (
-          <>
-            {isDriversLoading && <SkeletonCardGrid cards={6} />}
-
-            {isDriversError && (
-              <ErrorState
-                message="Failed to load drivers"
-                error={driversError}
-                onRetry={refetchDrivers}
-              />
-            )}
-
-            <DriverList drivers={drivers} driversCount={driversData?.count} />
-          </>
-        )}
 
         {selectedSessionKey && activeTab === "compare" && (
           <DriverComparisonPanel

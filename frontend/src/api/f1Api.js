@@ -74,3 +74,13 @@ export const getAiSummary = async (sessionKey) => {
 
   return response.data;
 };
+export const getRaceClassification = async (year, round) => {
+  const response = await axiosClient.get("/results/race-classification", {
+    params: {
+      year,
+      round,
+    },
+  });
+
+  return response.data;
+};

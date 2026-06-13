@@ -5,14 +5,14 @@ const tabs = [
     description: "Race summary and AI insights",
   },
   {
+    id: "classification",
+    label: "Classification",
+    description: "Final race result",
+  },
+  {
     id: "fastest-laps",
     label: "Fastest Laps",
     description: "Leaderboard and chart",
-  },
-  {
-    id: "drivers",
-    label: "Session Drivers",
-    description: "Driver list and teams",
   },
   {
     id: "compare",
@@ -53,8 +53,8 @@ function DashboardTabs({ activeTab, onTabChange }) {
               type="button"
               onClick={() => onTabChange(tab.id)}
               className={`rounded-xl border p-4 text-left transition ${isActive
-                  ? "border-red-500 bg-red-950/40"
-                  : "border-slate-800 bg-slate-950 hover:border-slate-600"
+                ? "border-red-500 bg-red-950/40"
+                : "border-slate-800 bg-slate-950 hover:border-slate-600"
                 }`}
             >
               <p
