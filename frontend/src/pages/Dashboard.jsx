@@ -12,8 +12,6 @@ import FastestLapLeaderboard from "../components/laps/FastestLapLeaderboard";
 import RaceControlPanel from "../components/race-control/RaceControlPanel";
 import DriverComparisonPanel from "../components/comparison/DriverComparisonPanel";
 import SessionOverview from "../components/overview/SessionOverview";
-import RaceDetails from "../components/overview/RaceDetails";
-import SessionDetails from "../components/overview/SessionDetails";
 import EmptyDashboardState from "../components/common/EmptyDashboardState";
 import DashboardTabs from "../components/navigation/DashboardTabs";
 
@@ -36,11 +34,11 @@ import { useAiSummary } from "../hooks/useAiSummary";
 const availableYears = [2023, 2024, 2025];
 
 const VALID_DASHBOARD_TABS = [
+  "overview",
   "fastest-laps",
   "drivers",
   "compare",
   "race-control",
-  "ai-summary",
 ];
 
 function Dashboard() {
@@ -71,7 +69,7 @@ function Dashboard() {
 
     return VALID_DASHBOARD_TABS.includes(tabFromUrl)
       ? tabFromUrl
-      : "fastest-laps";
+      : "overview";
   });
 
   useEffect(() => {
@@ -174,7 +172,7 @@ function Dashboard() {
     isError: isAiSummaryError,
     error: aiSummaryError,
     refetch: refetchAiSummary,
-  } = useAiSummary(selectedSessionKey, activeTab === "ai-summary");
+  } = useAiSummary(selectedSessionKey, activeTab === "overview");
 
   const raceControlMessages = raceControlData?.messages || [];
   const raceControlCategoryCounts = raceControlData?.event_counts?.by_category || {};
@@ -190,6 +188,7 @@ function Dashboard() {
     (race) => String(race.meeting_key) === String(selectedMeetingKey)
   );
 
+
   const sessions = sessionsData?.sessions || [];
 
   const selectedSession = sessions.find(
@@ -204,14 +203,14 @@ function Dashboard() {
     setSelectedSessionKey("");
     setSelectedDriver1("");
     setSelectedDriver2("");
-    setActiveTab("fastest-laps");
+    setActiveTab("overview");
 
     const nextParams = new URLSearchParams(searchParams);
 
     nextParams.set("year", String(nextYear));
     nextParams.delete("meeting_key");
     nextParams.delete("session_key");
-    nextParams.set("tab", "fastest-laps");
+    nextParams.set("tab", "overview");
 
     setSearchParams(nextParams);
   };
@@ -223,7 +222,7 @@ function Dashboard() {
     setSelectedSessionKey("");
     setSelectedDriver1("");
     setSelectedDriver2("");
-    setActiveTab("fastest-laps");
+    setActiveTab("overview");
 
     const nextParams = new URLSearchParams(searchParams);
 
@@ -236,7 +235,7 @@ function Dashboard() {
     }
 
     nextParams.delete("session_key");
-    nextParams.set("tab", "fastest-laps");
+    nextParams.set("tab", "overview");
 
     setSearchParams(nextParams);
   };
@@ -247,7 +246,7 @@ function Dashboard() {
     setSelectedSessionKey(sessionKey);
     setSelectedDriver1("");
     setSelectedDriver2("");
-    setActiveTab("fastest-laps");
+    setActiveTab("overview");
 
     const nextParams = new URLSearchParams(searchParams);
 
@@ -263,7 +262,7 @@ function Dashboard() {
       nextParams.delete("session_key");
     }
 
-    nextParams.set("tab", "fastest-laps");
+    nextParams.set("tab", "overview");
 
     setSearchParams(nextParams);
   };
@@ -284,7 +283,7 @@ function Dashboard() {
   return (
     <main className="min-h-screen bg-slate-950 px-4 py-6 text-slate-100 sm:px-6 sm:py-8">
       <div className="mx-auto max-w-6xl">
-        <div className="mb-8 rounded-2xl border border-slate-800 bg-slate-900/60 p-6">
+        <div className="mb-6 rounded-2xl border border-slate-800 bg-slate-900/60 p-6">
           <div className="flex flex-col justify-between gap-4 md:flex-row md:items-center">
             <div>
               <p className="text-sm font-semibold uppercase tracking-[0.25em] text-red-400">
@@ -333,8 +332,6 @@ function Dashboard() {
           handleSessionChange={handleSessionChange}
         />
 
-
-
         {isRacesLoading && (
           <LoadingState message={`Loading races for ${year}...`} />
         )}
@@ -345,12 +342,6 @@ function Dashboard() {
             error={racesError}
             onRetry={refetchRaces}
           />
-        )}
-
-        {!isRacesLoading && !isRacesError && races.length > 0 && (
-          <div className="mt-4 text-sm text-slate-500">
-            Found {racesData?.count} races for the {year} season.
-          </div>
         )}
 
         {selectedMeetingKey && isSessionsLoading && (
@@ -365,23 +356,38 @@ function Dashboard() {
           />
         )}
 
-        <RaceDetails selectedRace={selectedRace} />
-
-        <SessionDetails selectedSession={selectedSession} />
         {!selectedSessionKey && <EmptyDashboardState />}
-
-        {selectedSessionKey && isOverviewLoading && <SkeletonCardGrid cards={6} />}
-
-        {selectedSessionKey && isOverviewError && (
-          <ErrorState message="Failed to load session overview"
-            error={overviewError}
-            onRetry={refetchOverview} />
-        )}
-
-        <SessionOverview overviewData={overviewData} />
 
         {selectedSessionKey && (
           <DashboardTabs activeTab={activeTab} onTabChange={handleTabChange} />
+        )}
+
+        {selectedSessionKey && activeTab === "overview" && (
+          <>
+            {isOverviewLoading && <SkeletonCardGrid cards={6} />}
+
+            {isOverviewError && (
+              <ErrorState
+                message="Failed to load session overview"
+                error={overviewError}
+                onRetry={refetchOverview}
+              />
+            )}
+
+            <SessionOverview
+              overviewData={overviewData}
+              selectedRace={selectedRace}
+              selectedSession={selectedSession}
+            />
+
+            <AiSessionSummary
+              summaryData={aiSummaryData}
+              isLoading={isAiSummaryLoading}
+              isError={isAiSummaryError}
+              error={aiSummaryError}
+              onRetry={refetchAiSummary}
+            />
+          </>
         )}
 
         {selectedSessionKey && activeTab === "fastest-laps" && (
@@ -464,17 +470,6 @@ function Dashboard() {
             />
           </>
         )}
-
-        {selectedSessionKey && activeTab === "ai-summary" && (
-          <AiSessionSummary
-            summaryData={aiSummaryData}
-            isLoading={isAiSummaryLoading}
-            isError={isAiSummaryError}
-            error={aiSummaryError}
-            onRetry={refetchAiSummary}
-          />
-        )}
-
       </div>
     </main>
   );

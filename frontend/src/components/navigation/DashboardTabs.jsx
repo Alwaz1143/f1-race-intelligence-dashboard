@@ -1,5 +1,10 @@
 const tabs = [
   {
+    id: "overview",
+    label: "Overview",
+    description: "Race summary and AI insights",
+  },
+  {
     id: "fastest-laps",
     label: "Fastest Laps",
     description: "Leaderboard and chart",
@@ -19,13 +24,7 @@ const tabs = [
     label: "Race Control",
     description: "Messages and events",
   },
-  {
-    id: "ai-summary",
-    label: "AI Summary",
-    description: "Generated session insights",
-  },
 ];
-
 function DashboardTabs({ activeTab, onTabChange }) {
   return (
     <section className="mt-6 rounded-2xl border border-slate-800 bg-slate-900/60 p-4 sm:p-5">
