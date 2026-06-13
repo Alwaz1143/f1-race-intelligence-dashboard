@@ -26,7 +26,7 @@ This project is built to demonstrate full-stack software development skills, inc
 
 ## Live Demo
 
-- Frontend: https://f1-race-intelligence-dashboard-beta.vercel.app
+- Frontend: https://f1live.alwaz.tech
 - Backend API: https://f1-race-intelligence-api.onrender.com
 - API Docs: https://f1-race-intelligence-api.onrender.com/docs
 
