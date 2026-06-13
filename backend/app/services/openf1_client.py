@@ -31,7 +31,7 @@ class OpenF1Client:
         cache_key = self.build_cache_key(endpoint, params)
 
         if use_cache:
-            cached_data = cache.get(cache_key)
+            cached_data = await cache.get(cache_key)
 
             if cached_data is not None:
                 return cached_data
@@ -43,7 +43,7 @@ class OpenF1Client:
                 data = response.json()
 
                 if use_cache:
-                    cache.set(cache_key, data, ttl_seconds)
+                    await cache.set(cache_key, data, ttl_seconds)
 
                 return data
 
