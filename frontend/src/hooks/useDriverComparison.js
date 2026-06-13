@@ -1,14 +1,38 @@
 import { useQuery } from "@tanstack/react-query";
 
-import { compareDrivers } from "../api/f1Api";
+import { getDriverComparison } from "../api/f1Api";
 
-export const useDriverComparison = (sessionKey, driver1, driver2) => {
+function shouldRetryRequest(failureCount, error) {
+  const status = error?.response?.status;
+
+  if (!status) {
+    return failureCount < 3;
+  }
+
+  const retryableStatuses = [408, 429, 500, 502, 503, 504];
+
+  return retryableStatuses.includes(status) && failureCount < 3;
+}
+
+export function useDriverComparison(
+  sessionKey,
+  driver1,
+  driver2,
+  enabled = true
+) {
   return useQuery({
     queryKey: ["driver-comparison", sessionKey, driver1, driver2],
-    queryFn: () => compareDrivers(sessionKey, driver1, driver2),
-    enabled: Boolean(sessionKey && driver1 && driver2 && driver1 !== driver2),
-    retry: 1,
+    queryFn: () => getDriverComparison(sessionKey, driver1, driver2),
+    enabled:
+      Boolean(sessionKey) &&
+      Boolean(driver1) &&
+      Boolean(driver2) &&
+      driver1 !== driver2 &&
+      enabled,
+    retry: shouldRetryRequest,
+    retryDelay: (attemptIndex) =>
+      Math.min(1000 * 2 ** attemptIndex, 8000),
     staleTime: 5 * 60 * 1000,
     refetchOnWindowFocus: false,
   });
-};
+}
