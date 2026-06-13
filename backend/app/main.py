@@ -9,7 +9,8 @@ from app.api.routes import (
     laps,
     race_control,
     analytics,
-    cache
+    cache,
+    ai_summary
 )
 from app.core.config import settings
 
@@ -48,3 +49,4 @@ app.include_router(laps.router, prefix="/api", tags=["Laps"])
 app.include_router(race_control.router, prefix="/api", tags=["Race Control"])
 app.include_router(analytics.router, prefix="/api", tags=["Analytics"])
 app.include_router(cache.router, prefix="/api", tags=["Cache"])
+app.include_router(ai_summary.router, prefix="/api", tags=["AI Summary"])

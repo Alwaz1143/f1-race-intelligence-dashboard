@@ -64,3 +64,13 @@ export const compareDrivers = async (sessionKey, driver1, driver2) => {
 
   return response.data;
 };
+
+export const getAiSummary = async (sessionKey) => {
+  const response = await axiosClient.get("/analytics/ai-summary", {
+    params: {
+      session_key: sessionKey,
+    },
+  });
+
+  return response.data;
+};

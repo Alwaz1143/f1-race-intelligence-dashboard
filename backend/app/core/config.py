@@ -16,6 +16,9 @@ class Settings:
         os.getenv("FRONTEND_URL", "http://localhost:5173")
     )
 
+    GEMINI_API_KEY: str | None = os.getenv("GEMINI_API_KEY")
+    GEMINI_MODEL: str = os.getenv("GEMINI_MODEL", "gemini-3.5-flash")
+    
     @property
     def allowed_origins(self) -> list[str]:
         origins = [

@@ -141,6 +141,8 @@ This project is built to demonstrate full-stack software development skills, inc
 - Custom 404 page and React error boundary for safer production UI
 - Redis caching layer
 - Automated frontend and backend test
+- AI-generated session summary
+
 
 ## Backend API Endpoints
 
@@ -366,7 +368,6 @@ Completed:
 ## Planned Improvements
 
 - Add screenshots and demo GIF to README
-- Add AI-generated session summary
 - Add more advanced race analytics
 - Improve accessibility
 - Add custom domain

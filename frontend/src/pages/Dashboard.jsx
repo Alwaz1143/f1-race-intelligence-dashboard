@@ -30,6 +30,9 @@ import { useDriverComparison } from "../hooks/useDriverComparison";
 import SkeletonCardGrid from "../components/common/SkeletonCardGrid";
 import TableSkeleton from "../components/common/TableSkeleton";
 
+import AiSessionSummary from "../components/summary/AiSessionSummary";
+import { useAiSummary } from "../hooks/useAiSummary";
+
 const availableYears = [2023, 2024, 2025];
 
 const VALID_DASHBOARD_TABS = [
@@ -37,6 +40,7 @@ const VALID_DASHBOARD_TABS = [
   "drivers",
   "compare",
   "race-control",
+  "ai-summary",
 ];
 
 function Dashboard() {
@@ -92,6 +96,7 @@ function Dashboard() {
     setSelectedDriver1("");
     setSelectedDriver2("");
   }, [selectedSessionKey]);
+
 
   const {
     data: healthData,
@@ -163,7 +168,13 @@ function Dashboard() {
       difference: lap.difference,
     })) || [];
 
-
+  const {
+    data: aiSummaryData,
+    isLoading: isAiSummaryLoading,
+    isError: isAiSummaryError,
+    error: aiSummaryError,
+    refetch: refetchAiSummary,
+  } = useAiSummary(selectedSessionKey, activeTab === "ai-summary");
 
   const raceControlMessages = raceControlData?.messages || [];
   const raceControlCategoryCounts = raceControlData?.event_counts?.by_category || {};
@@ -452,6 +463,16 @@ function Dashboard() {
               raceControlFlagCounts={raceControlFlagCounts}
             />
           </>
+        )}
+
+        {selectedSessionKey && activeTab === "ai-summary" && (
+          <AiSessionSummary
+            summaryData={aiSummaryData}
+            isLoading={isAiSummaryLoading}
+            isError={isAiSummaryError}
+            error={aiSummaryError}
+            onRetry={refetchAiSummary}
+          />
         )}
 
       </div>

@@ -19,6 +19,11 @@ const tabs = [
     label: "Race Control",
     description: "Messages and events",
   },
+  {
+    id: "ai-summary",
+    label: "AI Summary",
+    description: "Generated session insights",
+  },
 ];
 
 function DashboardTabs({ activeTab, onTabChange }) {
@@ -39,7 +44,7 @@ function DashboardTabs({ activeTab, onTabChange }) {
         </p>
       </div>
 
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
         {tabs.map((tab) => {
           const isActive = activeTab === tab.id;
 
@@ -48,16 +53,14 @@ function DashboardTabs({ activeTab, onTabChange }) {
               key={tab.id}
               type="button"
               onClick={() => onTabChange(tab.id)}
-              className={`rounded-xl border p-4 text-left transition ${
-                isActive
+              className={`rounded-xl border p-4 text-left transition ${isActive
                   ? "border-red-500 bg-red-950/40"
                   : "border-slate-800 bg-slate-950 hover:border-slate-600"
-              }`}
+                }`}
             >
               <p
-                className={`font-semibold ${
-                  isActive ? "text-red-300" : "text-slate-100"
-                }`}
+                className={`font-semibold ${isActive ? "text-red-300" : "text-slate-100"
+                  }`}
               >
                 {tab.label}
               </p>
