@@ -155,7 +155,7 @@ function Dashboard() {
     isError: isAiSummaryError,
     error: aiSummaryError,
     refetch: refetchAiSummary,
-  } = useAiSummary(selectedSessionKey, activeTab === "overview");
+  } = useAiSummary(selectedSessionKey, Boolean(selectedSessionKey));
 
 
 

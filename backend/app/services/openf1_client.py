@@ -10,7 +10,13 @@ from app.core.cache import cache
 class OpenF1Client:
     def __init__(self):
         self.base_url = settings.OPENF1_BASE_URL
+        self._client: httpx.AsyncClient | None = None
         self._inflight: dict[str, asyncio.Future] = {}
+
+    async def _get_client(self) -> httpx.AsyncClient:
+        if self._client is None:
+            self._client = httpx.AsyncClient(timeout=httpx.Timeout(10.0))
+        return self._client
 
     def build_cache_key(self, endpoint: str, params: dict | None = None):
         if not params:
@@ -38,13 +44,13 @@ class OpenF1Client:
         timeout_seconds: float,
     ):
         last_error = None
+        client = await self._get_client()
 
         for attempt in range(max_retries):
             try:
-                async with httpx.AsyncClient(timeout=timeout_seconds) as client:
-                    response = await client.get(url, params=params)
-                    response.raise_for_status()
-                    return response.json()
+                response = await client.get(url, params=params, timeout=timeout_seconds)
+                response.raise_for_status()
+                return response.json()
 
             except httpx.HTTPStatusError as e:
                 last_error = e

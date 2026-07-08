@@ -43,6 +43,9 @@ build/
 # Logs
 *.log
 
+# Cache data
+cache_data/
+
 # SQLite future cache/database
 *.db
 *.sqlite

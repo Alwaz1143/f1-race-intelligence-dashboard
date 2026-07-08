@@ -37,18 +37,17 @@ def build_driver_map(drivers: list[dict]):
 
 
 async def get_session_overview_data(session_key: int):
-    sessions = await openf1_client.get("sessions", params={"session_key": session_key})
-
-    raise_not_found_if_empty(
-        sessions, f"No session found for session_key={session_key}"
-    )
-
+    sessions_task = openf1_client.get("sessions", params={"session_key": session_key})
     drivers_task = get_cleaned_drivers(session_key)
     laps_task = get_cleaned_laps(session_key)
     rc_task = get_cleaned_race_control_messages(session_key)
 
-    drivers, laps, race_control_messages = await asyncio.gather(
-        drivers_task, laps_task, rc_task
+    sessions, drivers, laps, race_control_messages = await asyncio.gather(
+        sessions_task, drivers_task, laps_task, rc_task
+    )
+
+    raise_not_found_if_empty(
+        sessions, f"No session found for session_key={session_key}"
     )
 
     session_info = sessions[0]

@@ -22,7 +22,7 @@ export function useAiSummary(sessionKey, enabled = true) {
     retry: shouldRetryRequest,
     retryDelay: (attemptIndex) =>
       Math.min(1000 * 2 ** attemptIndex, 5000),
-    staleTime: 10 * 60 * 1000,
+    staleTime: 30 * 60 * 1000,
     refetchOnWindowFocus: false,
   });
 }
