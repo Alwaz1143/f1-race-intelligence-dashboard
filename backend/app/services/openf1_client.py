@@ -10,6 +10,7 @@ from app.core.cache import cache
 class OpenF1Client:
     def __init__(self):
         self.base_url = settings.OPENF1_BASE_URL
+        self._inflight: dict[str, asyncio.Future] = {}
 
     def build_cache_key(self, endpoint: str, params: dict | None = None):
         if not params:
@@ -29,24 +30,13 @@ class OpenF1Client:
 
         return True
 
-    async def get(
+    async def _fetch_with_retry(
         self,
-        endpoint: str,
-        params: dict | None = None,
-        use_cache: bool = True,
-        ttl_seconds: int = 3600,
-        max_retries: int = 2,
-        timeout_seconds: float = 15.0,
+        url: str,
+        params: dict | None,
+        max_retries: int,
+        timeout_seconds: float,
     ):
-        url = f"{self.base_url}/{endpoint}"
-        cache_key = self.build_cache_key(endpoint, params)
-
-        if use_cache:
-            cached_data = await cache.get(cache_key)
-
-            if cached_data is not None:
-                return cached_data
-
         last_error = None
 
         for attempt in range(max_retries):
@@ -54,12 +44,7 @@ class OpenF1Client:
                 async with httpx.AsyncClient(timeout=timeout_seconds) as client:
                     response = await client.get(url, params=params)
                     response.raise_for_status()
-                    data = response.json()
-
-                    if use_cache and self.should_cache_response(endpoint, data):
-                        await cache.set(cache_key, data, ttl_seconds)
-
-                    return data
+                    return response.json()
 
             except httpx.HTTPStatusError as e:
                 last_error = e
@@ -93,6 +78,48 @@ class OpenF1Client:
             status_code=503,
             detail=f"OpenF1 API request failed after retries: {str(last_error)}",
         )
+
+    async def get(
+        self,
+        endpoint: str,
+        params: dict | None = None,
+        use_cache: bool = True,
+        ttl_seconds: int = 3600,
+        max_retries: int = 1,
+        timeout_seconds: float = 10.0,
+    ):
+        url = f"{self.base_url}/{endpoint}"
+        cache_key = self.build_cache_key(endpoint, params)
+
+        if use_cache:
+            cached_data = await cache.get(cache_key)
+
+            if cached_data is not None:
+                return cached_data
+
+        inflight = self._inflight.get(cache_key)
+        if inflight is not None:
+            return await inflight
+
+        loop = asyncio.get_event_loop()
+        future = loop.create_future()
+        self._inflight[cache_key] = future
+
+        try:
+            data = await self._fetch_with_retry(url, params, max_retries, timeout_seconds)
+
+            if use_cache and self.should_cache_response(endpoint, data):
+                await cache.set(cache_key, data, ttl_seconds)
+
+            future.set_result(data)
+            return data
+
+        except Exception as e:
+            future.set_exception(e)
+            raise
+
+        finally:
+            self._inflight.pop(cache_key, None)
 
 
 openf1_client = OpenF1Client()

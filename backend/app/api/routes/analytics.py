@@ -1,12 +1,20 @@
 from fastapi import APIRouter, Query
 
 from app.services.analytics_service import (
+    get_bulk_analytics_data,
     get_session_overview_data,
     get_fastest_laps_leaderboard,
-    compare_driver_lap_data
+    compare_driver_lap_data,
 )
 
 router = APIRouter()
+
+
+@router.get("/analytics/bulk")
+async def get_bulk_analytics(
+    session_key: int = Query(..., description="OpenF1 session key")
+):
+    return await get_bulk_analytics_data(session_key)
 
 
 @router.get("/analytics/session-overview")

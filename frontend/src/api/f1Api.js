@@ -1,5 +1,13 @@
 import axiosClient from "./axiosClient";
 
+export const getBulkAnalytics = async (sessionKey) => {
+  const response = await axiosClient.get("/analytics/bulk", {
+    params: { session_key: sessionKey },
+  });
+
+  return response.data;
+};
+
 export const getDriverComparison = async (sessionKey, driver1, driver2) => {
   const response = await axiosClient.get("/analytics/compare-drivers", {
     params: {

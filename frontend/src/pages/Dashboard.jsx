@@ -1,13 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router";
+import { useQuery } from "@tanstack/react-query";
 
-
-// import SectionHeader from "../components/common/SectionHeader";
-// import StatCard from "../components/cards/StatCard";
 import LoadingState from "../components/common/LoadingState";
 import ErrorState from "../components/common/ErrorState";
 import DashboardFilters from "../components/filters/DashboardFilters";
-import DriverList from "../components/drivers/DriverList";
 import FastestLapLeaderboard from "../components/laps/FastestLapLeaderboard";
 import RaceControlPanel from "../components/race-control/RaceControlPanel";
 import DriverComparisonPanel from "../components/comparison/DriverComparisonPanel";
@@ -18,19 +15,16 @@ import DashboardTabs from "../components/navigation/DashboardTabs";
 import { useHealth } from "../hooks/useHealth";
 import { useRaces } from "../hooks/useRaces";
 import { useSessions } from "../hooks/useSessions";
-import { useSessionOverview } from "../hooks/useSessionOverview";
-import { useFastestLaps } from "../hooks/useFastestLaps";
-import { useDrivers } from "../hooks/useDrivers";
-import { useRaceControl } from "../hooks/useRaceControl";
 import { useDriverComparison } from "../hooks/useDriverComparison";
-import RaceClassificationTable from "../components/results/RaceClassificationTable";
 import { useRaceClassification } from "../hooks/useRaceClassification";
+import { useAiSummary } from "../hooks/useAiSummary";
+import { getBulkAnalytics } from "../api/f1Api";
+import RaceClassificationTable from "../components/results/RaceClassificationTable";
 
 import SkeletonCardGrid from "../components/common/SkeletonCardGrid";
 import TableSkeleton from "../components/common/TableSkeleton";
 
 import AiSessionSummary from "../components/summary/AiSessionSummary";
-import { useAiSummary } from "../hooks/useAiSummary";
 
 const availableYears = [2023, 2024, 2025];
 
@@ -120,36 +114,24 @@ function Dashboard() {
   } = useSessions(selectedMeetingKey);
 
   const {
-    data: overviewData,
-    isLoading: isOverviewLoading,
-    isError: isOverviewError,
-    error: overviewError,
-    refetch: refetchOverview,
-  } = useSessionOverview(selectedSessionKey);
+    data: sessionData,
+    isLoading: isSessionDataLoading,
+    isError: isSessionDataError,
+    error: sessionDataError,
+    refetch: refetchSessionData,
+  } = useQuery({
+    queryKey: ["session-data", selectedSessionKey],
+    queryFn: () => getBulkAnalytics(selectedSessionKey),
+    enabled: Boolean(selectedSessionKey),
+    staleTime: 5 * 60 * 1000,
+    refetchOnWindowFocus: false,
+    retry: 1,
+  });
 
-  const {
-    data: fastestLapsData,
-    isLoading: isFastestLapsLoading,
-    isError: isFastestLapsError,
-    error: fastestLapsError,
-    refetch: refetchFastestLaps,
-  } = useFastestLaps(selectedSessionKey);
-
-  const {
-    data: driversData,
-    isLoading: isDriversLoading,
-    isError: isDriversError,
-    error: driversError,
-    refetch: refetchDrivers,
-  } = useDrivers(selectedSessionKey);
-
-  const {
-    data: raceControlData,
-    isLoading: isRaceControlLoading,
-    isError: isRaceControlError,
-    error: raceControlError,
-    refetch: refetchRaceControl,
-  } = useRaceControl(selectedSessionKey);
+  const overviewData = sessionData?.overview;
+  const fastestLapsData = sessionData?.fastest_laps;
+  const driversData = sessionData?.drivers;
+  const raceControlData = sessionData?.race_control;
 
   const {
     data: comparisonData,
@@ -239,7 +221,7 @@ const selectedRound = useMemo(() => {
   } = useRaceClassification(
     year,
     selectedRound,
-    activeTab === "classification" && isRaceSession
+    isRaceSession && Boolean(selectedRound)
   );
 
 
@@ -412,13 +394,13 @@ const selectedRound = useMemo(() => {
 
         {selectedSessionKey && activeTab === "overview" && (
           <>
-            {isOverviewLoading && <SkeletonCardGrid cards={6} />}
+            {isSessionDataLoading && <SkeletonCardGrid cards={6} />}
 
-            {isOverviewError && (
+            {isSessionDataError && (
               <ErrorState
                 message="Failed to load session overview"
-                error={overviewError}
-                onRetry={refetchOverview}
+                error={sessionDataError}
+                onRetry={refetchSessionData}
               />
             )}
 
@@ -466,7 +448,7 @@ const selectedRound = useMemo(() => {
 
         {selectedSessionKey && activeTab === "fastest-laps" && (
           <>
-            {isFastestLapsLoading && (
+            {isSessionDataLoading && (
               <TableSkeleton
                 title="Loading fastest lap leaderboard..."
                 rows={8}
@@ -474,11 +456,11 @@ const selectedRound = useMemo(() => {
               />
             )}
 
-            {isFastestLapsError && (
+            {isSessionDataError && (
               <ErrorState
                 message="Failed to load fastest laps"
-                error={fastestLapsError}
-                onRetry={refetchFastestLaps}
+                error={sessionDataError}
+                onRetry={refetchSessionData}
               />
             )}
 
@@ -505,7 +487,7 @@ const selectedRound = useMemo(() => {
 
         {selectedSessionKey && activeTab === "race-control" && (
           <>
-            {isRaceControlLoading && (
+            {isSessionDataLoading && (
               <TableSkeleton
                 title="Loading race control messages..."
                 rows={8}
@@ -513,11 +495,11 @@ const selectedRound = useMemo(() => {
               />
             )}
 
-            {isRaceControlError && (
+            {isSessionDataError && (
               <ErrorState
                 message="Failed to load race control messages"
-                error={raceControlError}
-                onRetry={refetchRaceControl}
+                error={sessionDataError}
+                onRetry={refetchSessionData}
               />
             )}
 

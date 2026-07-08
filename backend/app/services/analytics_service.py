@@ -1,5 +1,7 @@
+import asyncio
 from collections import Counter
 
+from app.core.cache import cache
 from app.services.openf1_client import openf1_client
 from app.services.driver_service import get_cleaned_drivers
 from app.services.lap_service import get_cleaned_laps
@@ -41,9 +43,13 @@ async def get_session_overview_data(session_key: int):
         sessions, f"No session found for session_key={session_key}"
     )
 
-    drivers = await get_cleaned_drivers(session_key)
-    laps = await get_cleaned_laps(session_key)
-    race_control_messages = await get_cleaned_race_control_messages(session_key)
+    drivers_task = get_cleaned_drivers(session_key)
+    laps_task = get_cleaned_laps(session_key)
+    rc_task = get_cleaned_race_control_messages(session_key)
+
+    drivers, laps, race_control_messages = await asyncio.gather(
+        drivers_task, laps_task, rc_task
+    )
 
     session_info = sessions[0]
 
@@ -98,8 +104,10 @@ async def get_session_overview_data(session_key: int):
 
 
 async def get_fastest_laps_leaderboard(session_key: int):
-    laps = await get_cleaned_laps(session_key)
-    drivers = await get_cleaned_drivers(session_key)
+    laps_task = get_cleaned_laps(session_key)
+    drivers_task = get_cleaned_drivers(session_key)
+
+    laps, drivers = await asyncio.gather(laps_task, drivers_task)
 
     raise_not_found_if_empty(laps, f"No lap data found for session_key={session_key}")
 
@@ -232,8 +240,10 @@ async def compare_driver_lap_data(
 ):
     validate_different_drivers(driver1, driver2)
 
-    laps = await get_cleaned_laps(session_key)
-    drivers = await get_cleaned_drivers(session_key)
+    laps_task = get_cleaned_laps(session_key)
+    drivers_task = get_cleaned_drivers(session_key)
+
+    laps, drivers = await asyncio.gather(laps_task, drivers_task)
 
     raise_not_found_if_empty(
         laps,
@@ -254,17 +264,18 @@ async def compare_driver_lap_data(
             f"Driver {driver2} not found in session_key={session_key}"
         )
 
-    driver1_laps = await get_driver_laps_with_fallback(
+    d1_task = get_driver_laps_with_fallback(
         session_key=session_key,
         driver_number=driver1,
         session_laps=laps,
     )
-
-    driver2_laps = await get_driver_laps_with_fallback(
+    d2_task = get_driver_laps_with_fallback(
         session_key=session_key,
         driver_number=driver2,
         session_laps=laps,
     )
+
+    driver1_laps, driver2_laps = await asyncio.gather(d1_task, d2_task)
 
     driver1_stats = calculate_driver_lap_stats(driver1_laps)
     driver2_stats = calculate_driver_lap_stats(driver2_laps)
@@ -364,3 +375,44 @@ async def compare_driver_lap_data(
         ),
         "lap_by_lap_comparison": lap_by_lap_comparison
     }
+
+
+BULK_CACHE_TTL = 300
+
+
+async def get_bulk_analytics_data(session_key: int):
+    cache_key = f"bulk:analytics:{session_key}"
+
+    cached = await cache.get(cache_key)
+    if cached is not None:
+        return cached
+
+    overview_task = get_session_overview_data(session_key)
+    fastest_laps_task = get_fastest_laps_leaderboard(session_key)
+    drivers_task = get_cleaned_drivers(session_key)
+    rc_task = get_cleaned_race_control_messages(session_key)
+
+    overview, fastest_laps, drivers, rc_messages = await asyncio.gather(
+        overview_task, fastest_laps_task, drivers_task, rc_task
+    )
+
+    result = {
+        "session_key": session_key,
+        "overview": overview,
+        "fastest_laps": fastest_laps,
+        "drivers": {
+            "session_key": session_key,
+            "count": len(drivers),
+            "drivers": drivers,
+        },
+        "race_control": {
+            "session_key": session_key,
+            "count": len(rc_messages),
+            "event_counts": get_race_control_counts(rc_messages),
+            "messages": rc_messages,
+        },
+    }
+
+    await cache.set(cache_key, result, BULK_CACHE_TTL)
+
+    return result

@@ -1,3 +1,4 @@
+import asyncio
 import json
 
 from fastapi import HTTPException
@@ -35,9 +36,13 @@ async def generate_ai_session_summary(session_key: int):
             detail="Gemini API key is not configured.",
         )
 
-    overview_data = await get_session_overview_data(session_key)
-    fastest_laps_data = await get_fastest_laps_leaderboard(session_key)
-    race_control_messages = await get_cleaned_race_control_messages(session_key)
+    overview_task = get_session_overview_data(session_key)
+    fastest_laps_task = get_fastest_laps_leaderboard(session_key)
+    rc_task = get_cleaned_race_control_messages(session_key)
+
+    overview_data, fastest_laps_data, race_control_messages = await asyncio.gather(
+        overview_task, fastest_laps_task, rc_task
+    )
     race_control_counts = get_race_control_counts(race_control_messages)
 
     compact_payload = {
