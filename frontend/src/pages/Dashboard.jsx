@@ -311,38 +311,44 @@ const selectedRound = useMemo(() => {
   };
 
   return (
-    <main className="min-h-screen bg-slate-950 px-4 py-6 text-slate-100 sm:px-6 sm:py-8">
-      <div className="mx-auto max-w-6xl">
-        <div className="mb-6 rounded-2xl border border-slate-800 bg-slate-900/60 p-6">
-          <div className="flex flex-col justify-between gap-4 md:flex-row md:items-center">
+    <main className="min-h-screen bg-slate-950 px-4 py-8 text-slate-100 sm:px-6 sm:py-10">
+      <div className="mx-auto max-w-7xl">
+        <div className="mb-8 card-gradient rounded-xl border p-8 animate-slide-in-up">
+          <div className="flex flex-col justify-between gap-6 md:flex-row md:items-center">
             <div>
-              <p className="text-sm font-semibold uppercase tracking-[0.25em] text-red-400">
+              <p className="text-sm font-semibold uppercase tracking-[0.3em] bg-gradient-to-r from-red-500 to-red-400 bg-clip-text text-transparent">
                 Race Dashboard
               </p>
 
-              <h1 className="mt-2 text-3xl font-bold">
-                F1 Race Intelligence Dashboard
+              <h1 className="mt-3 text-4xl font-bold">
+                F1 Race Intelligence
               </h1>
 
-              <p className="mt-3 max-w-3xl text-slate-400">
+              <p className="mt-4 max-w-3xl text-slate-300">
                 Select a season, Grand Prix, and session to explore lap-time analytics,
                 fastest laps, driver comparisons, and race control messages.
               </p>
             </div>
 
-            <div className="rounded-xl border border-slate-800 bg-slate-950 px-4 py-3 text-sm">
+            <div className="card-gradient rounded-lg border px-5 py-3 text-sm font-medium whitespace-nowrap">
               {isHealthLoading && (
-                <span className="text-slate-400">Checking API...</span>
+                <span className="text-slate-400 animate-pulse">Checking API...</span>
               )}
 
               {!isHealthLoading && !isHealthError && (
-                <span className="text-green-400">
-                  API Status: {healthData?.status}
-                </span>
+                <div className="flex items-center gap-2">
+                  <span className="inline-block h-2 w-2 rounded-full bg-green-500 animate-pulse-glow" />
+                  <span className="text-green-400">
+                    {healthData?.status}
+                  </span>
+                </div>
               )}
 
               {isHealthError && (
-                <span className="text-red-400">API Offline</span>
+                <div className="flex items-center gap-2">
+                  <span className="inline-block h-2 w-2 rounded-full bg-red-500 animate-pulse-glow" />
+                  <span className="text-red-400">API Offline</span>
+                </div>
               )}
             </div>
           </div>

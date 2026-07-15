@@ -1,14 +1,16 @@
-function StatCard({ label, value, helper, valueClassName = "text-slate-100" }) {
+function StatCard({ label, value, helper, valueClassName = "text-white" }) {
   return (
-    <div className="rounded-xl bg-slate-950 p-4">
-      <p className="text-sm text-slate-400">{label}</p>
+    <div className="card-gradient rounded-lg border p-5 hover-lift group transition-all duration-300 animate-slide-in-up">
+      <p className="text-xs font-semibold uppercase tracking-[0.15em] text-slate-400 group-hover:text-slate-300">
+        {label}
+      </p>
 
-      <p className={`mt-2 text-2xl font-bold ${valueClassName}`}>
+      <p className={`mt-3 text-3xl font-black ${valueClassName}`}>
         {value ?? "N/A"}
       </p>
 
       {helper && (
-        <p className="mt-1 text-sm text-slate-500">
+        <p className="mt-2 text-xs text-slate-500 group-hover:text-slate-400">
           {helper}
         </p>
       )}

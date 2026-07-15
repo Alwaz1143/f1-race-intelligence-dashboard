@@ -1,7 +1,7 @@
 function Panel({ children, className = "" }) {
   return (
     <section
-      className={`rounded-3xl border border-slate-800/80 bg-slate-950/70 p-5 shadow-2xl shadow-black/20 backdrop-blur sm:p-6 ${className}`}
+      className={`glass rounded-xl border border-slate-700/50 p-6 shadow-2xl shadow-black/40 backdrop-blur-2xl transition-all duration-300 hover:shadow-black/60 sm:p-8 ${className}`}
     >
       {children}
     </section>

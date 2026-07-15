@@ -2,17 +2,17 @@ import { Link, NavLink } from "react-router";
 
 function Navbar() {
   const getNavLinkClass = ({ isActive }) =>
-    `rounded-xl px-3 py-2 text-sm font-semibold transition ${
+    `rounded-lg px-4 py-2 text-sm font-semibold transition-all duration-300 ${
       isActive
-        ? "bg-red-950/70 text-red-300 ring-1 ring-red-900/70"
-        : "text-slate-400 hover:bg-slate-900 hover:text-slate-100"
+        ? "bg-gradient-to-r from-red-600 to-red-500 text-white shadow-lg shadow-red-500/30 scale-105"
+        : "text-slate-300 hover:text-white hover:bg-slate-800/50"
     }`;
 
   return (
-    <header className="sticky top-0 z-50 border-b border-slate-800/80 bg-slate-950/80 backdrop-blur-xl">
-      <nav className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-4 sm:px-6">
-        <Link to="/" className="group flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-2xl border border-red-900/70 bg-red-950/50 text-lg font-black text-red-300 shadow-lg shadow-red-950/30 transition group-hover:bg-red-900/70">
+    <header className="sticky top-0 z-50 glass border-b border-slate-700/40 backdrop-blur-2xl">
+      <nav className="mx-auto flex max-w-7xl items-center justify-between gap-6 px-4 py-3 sm:px-8">
+        <Link to="/" className="group flex items-center gap-3 hover-lift">
+          <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-gradient-to-br from-red-600 to-red-700 text-lg font-black text-white shadow-lg shadow-red-600/40 group-hover:shadow-red-600/60 transition-all duration-300">
             F1
           </div>
 
@@ -20,13 +20,13 @@ function Navbar() {
             <p className="text-base font-black tracking-tight text-white">
               Race Intelligence
             </p>
-            <p className="hidden text-xs text-slate-500 sm:block">
-              Formula 1 session analysis
+            <p className="hidden text-xs text-slate-400 sm:block">
+              F1 Session Analysis
             </p>
           </div>
         </Link>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1">
           <NavLink to="/" className={getNavLinkClass}>
             Home
           </NavLink>

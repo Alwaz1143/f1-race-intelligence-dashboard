@@ -27,24 +27,24 @@ const tabs = [
 ];
 function DashboardTabs({ activeTab, onTabChange }) {
   return (
-    <section className="mt-6 rounded-2xl border border-slate-800 bg-slate-900/60 p-4 sm:p-5">
-      <div className="mb-4">
-        <p className="text-sm font-semibold uppercase tracking-[0.25em] text-red-400">
+    <section className="card-gradient mt-8 rounded-xl border p-6 sm:p-7 animate-slide-in-up">
+      <div className="mb-6">
+        <p className="text-xs font-semibold uppercase tracking-[0.3em] bg-gradient-to-r from-red-500 to-red-400 bg-clip-text text-transparent">
           Analysis Sections
         </p>
 
-        <h2 className="mt-2 text-xl font-bold text-slate-100">
+        <h2 className="mt-3 text-2xl font-bold text-white">
           Explore Session Data
         </h2>
 
-        <p className="mt-1 text-sm text-slate-500">
+        <p className="mt-2 text-sm text-slate-400">
           Switch between different analysis views without losing the selected
           race session.
         </p>
       </div>
 
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
-        {tabs.map((tab) => {
+        {tabs.map((tab, idx) => {
           const isActive = activeTab === tab.id;
 
           return (
@@ -52,19 +52,20 @@ function DashboardTabs({ activeTab, onTabChange }) {
               key={tab.id}
               type="button"
               onClick={() => onTabChange(tab.id)}
-              className={`rounded-xl border p-4 text-left transition ${isActive
-                ? "border-red-500 bg-red-950/40"
-                : "border-slate-800 bg-slate-950 hover:border-slate-600"
+              className={`rounded-lg border p-4 text-left transition-all duration-300 hover-lift ${isActive
+                ? "border-red-500/60 bg-gradient-to-br from-red-600/20 to-red-900/10 shadow-lg shadow-red-500/20 scale-105"
+                : "border-slate-700/50 bg-slate-800/30 hover:border-slate-600"
                 }`}
+              style={{ animationDelay: `${idx * 50}ms` }}
             >
               <p
-                className={`font-semibold ${isActive ? "text-red-300" : "text-slate-100"
+                className={`font-bold transition-colors duration-300 ${isActive ? "text-red-300" : "text-slate-200"
                   }`}
               >
                 {tab.label}
               </p>
 
-              <p className="mt-1 text-sm text-slate-500">
+              <p className="mt-2 text-xs text-slate-400 transition-colors duration-300">
                 {tab.description}
               </p>
             </button>
