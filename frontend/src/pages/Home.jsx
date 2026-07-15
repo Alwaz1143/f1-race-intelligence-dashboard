@@ -90,11 +90,11 @@ function Home() {
               <div className="flex items-center justify-between gap-4">
                 <div>
                   <p className="text-sm font-semibold uppercase tracking-[0.3em] bg-gradient-to-r from-red-500 to-red-400 bg-clip-text text-transparent">
-                    Race Snapshot
+                    Preview
                   </p>
 
                   <h2 className="mt-3 text-3xl font-bold">
-                    Session intelligence in one view
+                    Here's what you'll discover
                   </h2>
                 </div>
 

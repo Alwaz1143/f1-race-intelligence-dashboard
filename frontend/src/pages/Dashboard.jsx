@@ -316,17 +316,17 @@ const selectedRound = useMemo(() => {
         <div className="mb-8 card-gradient rounded-xl border p-8 animate-slide-in-up">
           <div className="flex flex-col justify-between gap-6 md:flex-row md:items-center">
             <div>
-              <p className="text-sm font-semibold uppercase tracking-[0.3em] bg-gradient-to-r from-red-500 to-red-400 bg-clip-text text-transparent">
+              <p className="text-xs font-semibold uppercase tracking-[0.3em] bg-gradient-to-r from-red-500 to-red-400 bg-clip-text text-transparent">
                 Race Dashboard
               </p>
 
               <h1 className="mt-3 text-4xl font-bold">
-                F1 Race Intelligence
+                Deep Dive Into Race Data
               </h1>
 
               <p className="mt-4 max-w-3xl text-slate-300">
-                Select a season, Grand Prix, and session to explore lap-time analytics,
-                fastest laps, driver comparisons, and race control messages.
+                Analyze lap-time trends, compare driver pace, track race control messages,
+                and get AI-powered session insights all in one place.
               </p>
             </div>
 

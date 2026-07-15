@@ -18,10 +18,10 @@ function DashboardFilters({
       <div className="flex flex-col justify-between gap-6 lg:flex-row lg:items-center">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.3em] bg-gradient-to-r from-red-500 to-red-400 bg-clip-text text-transparent">
-            Race Selection
+            Filter & Load
           </p>
           <h2 className="mt-3 text-2xl font-bold text-white">
-            Choose a session to analyze
+            Load a specific race session
           </h2>
         </div>
 
