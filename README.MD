@@ -3,90 +3,53 @@
 ![Frontend](https://img.shields.io/badge/Frontend-React-blue)
 ![Backend](https://img.shields.io/badge/Backend-FastAPI-green)
 ![Deployment](https://img.shields.io/badge/Deployment-Vercel%20%2B%20Render-black)
-![Status](https://img.shields.io/badge/Status-MVP%20Deployed-success)
-
+![Status](https://img.shields.io/badge/Status-Production-success)
 ![CI](https://github.com/Alwaz1143/f1-race-intelligence-dashboard/actions/workflows/ci.yml/badge.svg)
 
-A full-stack Formula 1 race analytics dashboard built with FastAPI, React, OpenF1 API, TanStack Query, Recharts, and caching.
-
-The project analyzes Formula 1 race sessions by showing race details, session overview metrics, fastest lap leaderboards, driver lists, driver comparison analytics, lap-time charts, and race control messages.
-
-## Project Purpose
-
-This project is built to demonstrate full-stack software development skills, including:
-
-- Backend API development with FastAPI
-- External API integration using OpenF1
-- Backend data cleaning and analytics logic
-- Caching for repeated API requests
-- React frontend development
-- Frontend server-state management using TanStack Query
-- Data visualization using Recharts
-- Clean component-based UI architecture
+A full-stack Formula 1 race analytics dashboard with AI-powered session summaries. Built with FastAPI, React, OpenF1 API, Jolpica API, TanStack Query, Recharts, and multi-layer caching.
 
 ## Live Demo
 
-- Frontend: https://f1live.alwaz.tech
-- Backend API: https://f1-race-intelligence-api.onrender.com
-- API Docs: https://f1-race-intelligence-api.onrender.com/docs
-
-
-## Screenshots
-
-### Home Page
-
-![Home Page](./docs/screenshots/home-page.png)
-
-### Dashboard Overview
-
-![Dashboard Overview](./docs/screenshots/dashboard-overview.png)
-
-### Fastest Lap Analysis
-
-![Fastest Lap Analysis](./docs/screenshots/fastest-laps.png)
-
-### Session Drivers
-
-![Session Drivers](./docs/screenshots/session-drivers.png)
-
-### Driver Comparison
-
-![Driver Comparison](./docs/screenshots/compare-drivers.png)
-
-### Race Control Analysis
-
-![Race Control Analysis](./docs/screenshots/race-control.png)
-
-## Demo Flow
-
-1. Open the deployed frontend.
-2. Select an F1 season.
-3. Select a Grand Prix.
-4. Select a session such as Race or Qualifying.
-5. View the session overview cards.
-6. Explore fastest lap leaderboard and fastest lap chart.
-7. View all session drivers.
-8. Compare two drivers using lap-time analytics.
-9. View race control messages and category chart.
-10. Refresh or share the dashboard URL with selected filters and active tab preserved.
+- **Frontend:** https://f1live.alwaz.tech
+- **Backend API:** https://f1-race-intelligence-api.onrender.com
+- **API Docs:** https://f1-race-intelligence-api.onrender.com/docs
 
 ## Feature Highlights
 
-- URL-driven dashboard filters for year, race, session, and active tab
-- Tab-based analytics sections to avoid one long dashboard page
-- TanStack Query caching to prevent unnecessary refetching
-- FastAPI backend service layer for clean analytics logic
-- In-memory cache with TTL for OpenF1 API responses
-- Recharts visualizations for lap-time and race-control analysis
-- Responsive UI with loading skeletons, empty states, and retryable errors
+### Core Analytics
+- Season / Grand Prix / Session selection with URL-driven state
+- Session overview cards (drivers, laps, race control events)
+- Fastest lap leaderboard with sector times and speeds
+- Driver comparison with lap-time charts and statistics
+- Race control messages with category/flag breakdown charts
+- Race classification results
 
+### AI-Powered Session Summary
+- Generates a natural-language F1 race report (session brief, key metrics, pace highlights, race control notes, key takeaway)
+- **Primary:** Groq LPU (`llama-3.3-70b-versatile`) — sub-second inference, free tier
+- **Fallback:** Google Gemini 3.5 Flash → Gemini 3.1 Flash Lite
+- Stale-while-revalidate: cached summaries served instantly, refreshed in background
+- Compact prompt payload (short keys, stripped nulls) to minimize tokens
+
+### Performance Optimizations
+- **3-layer cache:** Disk (persistent JSON, 30-day TTL) → Redis → InMemory — survives restarts
+- **Request coalescing:** concurrent identical OpenF1 requests share a single HTTP call
+- **Shared httpx client:** single connection pool reused across all calls (no SSL overhead)
+- **Async I/O:** all file cache reads/writes via `asyncio.to_thread`, Gemini via `aio` SDK
+- **Bulk analytics endpoint:** one API call replaces 4 separate frontend queries
+- **Parallel data fetching:** `asyncio.gather` across all service calls
+- **Optimized lap cleaning:** only essential fields kept, reducing serialization overhead
+
+### Frontend
+- TanStack Query for server-state caching and stale management
+- Recharts visualizations (line charts, bar charts, donut charts)
+- Loading skeletons, empty states, error boundaries with retry
+- SPA routing with shareable URL state
 
 ## Tech Stack
 
 ### Frontend
-
-- React
-- Vite
+- React + Vite
 - Tailwind CSS
 - Axios
 - TanStack Query
@@ -94,289 +57,223 @@ This project is built to demonstrate full-stack software development skills, inc
 - Recharts
 
 ### Backend
-
-- Python
-- FastAPI
+- Python + FastAPI
 - Uvicorn
-- HTTPX
+- HTTPX (shared async client)
+- openai (Groq API via OpenAI-compatible SDK)
+- google-genai (Gemini fallback)
 - python-dotenv
 
-
-
-
-### Data Source
-
-- OpenF1 API
-
 ### Caching
+- **DiskCache:** persistent JSON files with `asyncio.to_thread` (async I/O)
+- **Redis:** optional cloud cache layer
+- **InMemory:** local dictionary with TTL
 
-- In-memory cache with TTL
-- Redis planned for future improvement
-
-## Documentation
-
-- [Architecture](./docs/architecture.md)
-- [API Reference](./docs/api-reference.md)
-
-## Current Features
-
-- Season selection
-- Grand Prix selection
-- Session selection
-- Backend health check
-- Race details display
-- Session details display
-- Session overview cards
-- Fastest lap leaderboard
-- Driver list
-- Driver comparison analytics
-- Lap-time comparison chart
-- Race control messages
-- Race control category and flag counts
-- Loading, error, and empty states
-- Reusable frontend components
-- Backend service-layer architecture
-- Backend validation and error handling
-- In-memory caching layer
-- Custom 404 page and React error boundary for safer production UI
-- Redis caching layer
-- Automated frontend and backend test
-- AI-generated session summary
-
+### Data Sources
+- **OpenF1 API** — live session data (laps, drivers, race control, etc.)
+- **Jolpica API** — race classification results
+- **Groq LPU** — primary AI summary generation (free tier, 30 RPM / 1K RPD)
+- **Google Gemini** — fallback AI summary generation
 
 ## Backend API Endpoints
 
 ### Basic
-
-- `GET /`
-- `GET /api/health`
-- `GET /api/races?year=2024`
-- `GET /api/sessions?meeting_key=1234`
-- `GET /api/drivers?session_key=1234`
-- `GET /api/laps?session_key=1234&driver_number=1`
-- `GET /api/race-control?session_key=1234`
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/health` | Health check |
+| GET | `/api/races?year=2024` | Season calendar |
+| GET | `/api/sessions?meeting_key=1234` | Session list for a GP |
+| GET | `/api/drivers?session_key=1234` | Driver list |
+| GET | `/api/laps?session_key=1234&driver_number=1` | Lap data |
+| GET | `/api/race-control?session_key=1234` | Race control messages |
+| GET | `/api/classification?session_key=1234` | Race classification |
 
 ### Analytics
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/analytics/bulk?session_key=1234` | All session data in one call |
+| GET | `/api/analytics/session-overview?session_key=1234` | Overview metrics |
+| GET | `/api/analytics/fastest-laps?session_key=1234` | Fastest lap leaderboard |
+| GET | `/api/analytics/compare-drivers?session_key=1234&driver1=1&driver2=4` | Driver comparison |
+| GET | `/api/analytics/ai-summary?session_key=1234` | AI-generated session summary |
 
-- `GET /api/analytics/session-overview?session_key=1234`
-- `GET /api/analytics/fastest-laps?session_key=1234`
-- `GET /api/analytics/compare-drivers?session_key=1234&driver1=1&driver2=4`
-
-### Cache
-
-- `GET /api/cache/stats`
-- `DELETE /api/cache/clear`
+### Cache Management
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/cache/stats` | Cache hit/miss stats |
+| DELETE | `/api/cache/clear` | Clear all caches |
 
 ## Architecture
 
-The frontend does not directly call OpenF1.
-
-Instead, the data flow is:
-
-```text
-React Frontend
-↓
-FastAPI Backend
-↓
-Cache Layer
-↓
-OpenF1 API
+```
+React Frontend (Vercel)
+    ↓  single /api/analytics/bulk call
+FastAPI Backend (Render)
+    ↓  asyncio.gather + request coalescing
+Service Layer
+    ↓  DiskCache → RedisCache → InMemoryCache
+OpenF1 API / Jolpica API
 ```
 
-The backend is responsible for:
+The backend handles:
+- Fetching and cleaning OpenF1 / Jolpica data
+- Request coalescing (duplicate calls share one HTTP request)
+- Multi-layer caching (Disk → Redis → InMemory)
+- Analytics computation and data normalization
+- AI summary generation (Groq → Gemini fallback chain)
+- Stale-while-revalidate cache strategy
 
-- Fetching data from OpenF1
-    
-- Cleaning and normalizing API responses
-    
-- Calculating analytics
-    
-- Handling errors
-    
-- Caching repeated requests
-    
-- Returning frontend-ready JSON
-    
-
-The frontend is responsible for:
-
-- User interaction
-    
-- Filters and selections
-    
-- Loading and error states
-    
-- Displaying charts, tables, and cards
-    
+The frontend handles:
+- User interaction and URL-driven state
+- Single bulk query for dashboard data
+- Skeleton loading, empty states, error boundaries
+- Chart rendering (Recharts) and responsive layout
 
 ## Local Setup
 
-### Backend Setup
+### Prerequisites
+- Python 3.12+
+- Node.js 18+
+
+### Backend
 
 ```bash
 cd backend
 python -m venv venv
-```
 
-Activate virtual environment:
-
-```bash
 # Windows PowerShell
 .\venv\Scripts\Activate.ps1
-```
 
-Install dependencies:
-
-```bash
 pip install -r requirements.txt
 ```
 
-Create a `.env` file inside the `backend` folder:
+Create `backend/.env`:
 
 ```env
 OPENF1_BASE_URL=https://api.openf1.org/v1
 FRONTEND_URL=http://localhost:5173
+
+# Optional — AI summaries
+GROQ_API_KEY=your_groq_key
+GROQ_MODEL=llama-3.3-70b-versatile
+
+GEMINI_API_KEY=your_gemini_key
+GEMINI_MODEL=gemini-3.5-flash
+GEMINI_FALLBACK_MODEL=gemini-3.1-flash-lite
+
+# Optional — Redis caching
+REDIS_URL=
 ```
 
-Run backend:
+Run:
 
 ```bash
 uvicorn app.main:app --reload
 ```
 
-Backend runs at:
+Backend: http://127.0.0.1:8000
+API docs: http://127.0.0.1:8000/docs
 
-```text
-http://127.0.0.1:8000
-```
-
-API docs:
-
-```text
-http://127.0.0.1:8000/docs
-```
-
-### Frontend Setup
+### Frontend
 
 ```bash
 cd frontend
 npm install
 ```
 
-Create a `.env` file inside the `frontend` folder:
+Create `frontend/.env`:
 
 ```env
 VITE_API_BASE_URL=http://127.0.0.1:8000/api
 ```
 
-Run frontend:
+Run:
 
 ```bash
 npm run dev
 ```
 
-Frontend runs at:
+Frontend: http://localhost:5173
 
-```text
-http://localhost:5173
-```
+## Deployment
 
-## Deployment Plan
+### Backend (Render)
+1. Connect GitHub repo to Render
+2. **Root Directory:** `backend`
+3. **Build Command:** `pip install -r requirements.txt`
+4. **Start Command:** `uvicorn app.main:app --host 0.0.0.0 --port $PORT`
+5. Add env vars: `GROQ_API_KEY`, `GEMINI_API_KEY`, `FRONTEND_URLS`, `REDIS_URL` (optional)
+6. Use **UptimeRobot** to ping `/api/health` every 5 min to prevent cold starts
 
-The frontend will be deployed on Vercel and the backend will be deployed as a Python web service on Render.
-
-Production environment variables:
-
-Frontend:
-
-```env
-VITE_API_BASE_URL=https://your-render-backend-url.onrender.com/api
-```
-
-Backend:
-```env
-OPENF1_BASE_URL=https://api.openf1.org/v1
-FRONTEND_URL=https://your-vercel-frontend-url.vercel.app
-```
-
-
+### Frontend (Vercel)
+1. Connect GitHub repo to Vercel
+2. **Root Directory:** `frontend`
+3. **Build Command:** `npm run build`
+4. **Output Directory:** `dist`
+5. Add env var: `VITE_API_BASE_URL=https://your-render-app.onrender.com/api`
 
 ## Project Structure
 
-```text
+```
 f1-race-intelligence-dashboard/
-│
 ├── backend/
 │   ├── app/
-│   │   ├── api/routes/
-│   │   ├── core/
-│   │   ├── services/
-│   │   ├── utils/
-│   │   └── main.py
+│   │   ├── api/routes/       # FastAPI route handlers
+│   │   ├── core/             # Config, cache layer
+│   │   ├── services/         # Business logic, API clients
+│   │   ├── utils/            # Helpers (time formatting, etc.)
+│   │   └── main.py           # App entry point
+│   ├── cache_data/           # Disk cache (gitignored)
 │   ├── .env.example
 │   └── requirements.txt
-│
 ├── frontend/
 │   ├── src/
-│   │   ├── api/
-│   │   ├── components/
-│   │   ├── hooks/
-│   │   ├── pages/
-│   │   ├── routes/
-│   │   ├── utils/
-│   │   └── main.jsx
+│   │   ├── api/              # Axios client + API functions
+│   │   ├── components/       # Reusable UI components
+│   │   ├── hooks/            # TanStack Query hooks
+│   │   ├── pages/            # Route page components
+│   │   ├── routes/           # React Router config
+│   │   ├── utils/            # Frontend helpers
+│   │   └── main.jsx          # Entry point
 │   ├── .env.example
 │   └── package.json
-│
 ├── docs/
-│   └── architecture.md
-│
+│   ├── architecture.md
+│   ├── deployment-notes.md
+│   └── screenshots/
+├── .github/
+│   └── workflows/ci.yml      # Automated tests
 ├── .gitignore
 └── README.md
 ```
 
 ## Current Status
 
-The project is deployed and MVP-ready.
-
-Completed:
-
+### Completed
 - FastAPI backend deployed on Render
 - React frontend deployed on Vercel
-- Production CORS configured for deployed frontend domains
-- OpenF1 API integration working in production
-- Backend service-layer architecture
-- Backend validation and error handling
-- In-memory caching with TTL
-- Dashboard filters with URL query parameters
-- Tab-based dashboard navigation
-- Session overview cards
-- Fastest lap leaderboard
-- Fastest lap comparison chart
-- Driver list
-- Driver comparison analytics
-- Lap-time comparison chart
-- Race control messages
-- Race control category chart
-- Loading skeletons
-- Error states with retry actions
-- Responsive UI polish
-- Redis caching deployed
-- Automated frontend and backend test deployed
-    
+- Production CORS configured
+- OpenF1 + Jolpica API integration
+- Session overview, fastest laps, driver comparison, race control
+- Race classification results
+- AI session summaries (Groq primary + Gemini fallback)
+- 3-layer cache: Disk → Redis → InMemory
+- Request coalescing (duplicate call deduplication)
+- Shared httpx connection pool
+- Async I/O throughout (Gemini, file cache, etc.)
+- Bulk analytics endpoint (single API call for all dashboard data)
+- Stale-while-revalidate for AI summaries
+- URL-driven dashboard state and tab navigation
+- Loading skeletons, empty states, error boundaries
+- Recharts visualizations (line, bar, donut charts)
+- GitHub Actions CI (pytest + frontend build)
+- UptimeRobot keep-alive for Render backend
 
-## Planned Improvements
-
-- Add screenshots and demo GIF to README
-- Add more advanced race analytics
+### Planned
+- Add more advanced race analytics (tyre strategy, gap charts)
 - Improve accessibility
-- Add custom domain
-    
-
-## MVP Result
-
-The deployed MVP is working end-to-end with a Vercel frontend, Render backend, OpenF1 API integration, analytics endpoints, production CORS configuration, responsive dashboard UI, chart visualizations, loading states, retry handling, and URL-driven dashboard filters.
+- Screenshots and demo GIF in README
 
 ## Disclaimer
 
-This project uses OpenF1 API data for educational and portfolio purposes.
+This project uses OpenF1 API and Jolpica API data for educational and portfolio purposes. All F1 data belongs to Formula 1.
