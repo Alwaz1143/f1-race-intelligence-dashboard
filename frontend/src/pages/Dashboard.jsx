@@ -26,7 +26,11 @@ import TableSkeleton from "../components/common/TableSkeleton";
 
 import AiSessionSummary from "../components/summary/AiSessionSummary";
 
-const availableYears = [2023, 2024, 2025];
+const currentYear = new Date().getFullYear();
+const availableYears = Array.from(
+  { length: currentYear - 1950 + 1 },
+  (_, i) => 1950 + i
+);
 
 const VALID_DASHBOARD_TABS = [
   "overview",
@@ -48,11 +52,11 @@ function Dashboard() {
 
 
   const [year, setYear] = useState(
-    Number.isFinite(yearFromUrl) && yearFromUrl > 0 ? yearFromUrl : 2024
+    Number.isFinite(yearFromUrl) && yearFromUrl > 0 ? yearFromUrl : currentYear
   );
 
-  const [selectedMeetingKey, setSelectedMeetingKey] = useState(
-    searchParams.get("meeting_key") || ""
+  const [selectedRaceKey, setSelectedRaceKey] = useState(
+    searchParams.get("race_key") || ""
   );
 
   const [selectedSessionKey, setSelectedSessionKey] = useState(
@@ -69,7 +73,7 @@ function Dashboard() {
 
   useEffect(() => {
     const nextYear = Number(searchParams.get("year"));
-    const nextMeetingKey = searchParams.get("meeting_key") || "";
+    const nextRaceKey = searchParams.get("race_key") || "";
     const nextSessionKey = searchParams.get("session_key") || "";
     const tabFromUrl = searchParams.get("tab");
 
@@ -77,7 +81,7 @@ function Dashboard() {
       setYear(nextYear);
     }
 
-    setSelectedMeetingKey(nextMeetingKey);
+    setSelectedRaceKey(nextRaceKey);
     setSelectedSessionKey(nextSessionKey);
 
     if (VALID_DASHBOARD_TABS.includes(tabFromUrl)) {
@@ -105,13 +109,20 @@ function Dashboard() {
     refetch: refetchRaces,
   } = useRaces(year);
 
+  const selectedRace = races.find(
+    (race) => race.race_key === selectedRaceKey
+  );
+
   const {
     data: sessionsData,
     isLoading: isSessionsLoading,
     isError: isSessionsError,
     error: sessionsError,
     refetch: refetchSessions,
-  } = useSessions(selectedMeetingKey);
+  } = useSessions(
+    selectedRace?.meeting_key || null,
+    selectedRace?.race_key || null
+  );
 
   const {
     data: sessionData,
@@ -169,10 +180,6 @@ function Dashboard() {
 
   const races = racesData?.races || [];
 
-  const selectedRace = races.find(
-    (race) => String(race.meeting_key) === String(selectedMeetingKey)
-  );
-
 
   const sessions = sessionsData?.sessions || [];
 
@@ -180,37 +187,17 @@ function Dashboard() {
     (session) => String(session.session_key) === String(selectedSessionKey)
   );
 
-const selectedRound = useMemo(() => {
-  if (!selectedMeetingKey || !races.length) {
-    return null;
-  }
-
-  const championshipRaces = races.filter((race) => {
-    const raceText = `${race.meeting_name || ""} ${
-      race.meeting_official_name || ""
-    }`.toLowerCase();
-
-    return !raceText.includes("testing");
-  });
-
-  const sortedRaces = [...championshipRaces].sort((a, b) => {
-    const dateA = new Date(a.date_start || a.date || 0).getTime();
-    const dateB = new Date(b.date_start || b.date || 0).getTime();
-
-    return dateA - dateB;
-  });
-
-  const raceIndex = sortedRaces.findIndex(
-    (race) => String(race.meeting_key) === String(selectedMeetingKey)
-  );
-
-  return raceIndex >= 0 ? raceIndex + 1 : null;
-}, [races, selectedMeetingKey]);
+const selectedRound = selectedRace?.round || null;
 
 
 
   const isRaceSession =
     selectedSession?.session_name?.toLowerCase() === "race";
+
+  const showHistoricalClassification =
+    Boolean(selectedRaceKey) &&
+    selectedRace &&
+    !selectedRace.has_sessions;
 
   const {
     data: raceClassificationData,
@@ -221,7 +208,7 @@ const selectedRound = useMemo(() => {
   } = useRaceClassification(
     year,
     selectedRound,
-    isRaceSession && Boolean(selectedRound)
+    (isRaceSession || showHistoricalClassification) && Boolean(selectedRound)
   );
 
 
@@ -229,7 +216,7 @@ const selectedRound = useMemo(() => {
     const nextYear = Number(event.target.value);
 
     setYear(nextYear);
-    setSelectedMeetingKey("");
+    setSelectedRaceKey("");
     setSelectedSessionKey("");
     setSelectedDriver1("");
     setSelectedDriver2("");
@@ -238,7 +225,7 @@ const selectedRound = useMemo(() => {
     const nextParams = new URLSearchParams(searchParams);
 
     nextParams.set("year", String(nextYear));
-    nextParams.delete("meeting_key");
+    nextParams.delete("race_key");
     nextParams.delete("session_key");
     nextParams.set("tab", "overview");
 
@@ -246,26 +233,39 @@ const selectedRound = useMemo(() => {
   };
 
   const handleRaceChange = (event) => {
-    const meetingKey = event.target.value;
+    const raceKey = event.target.value;
 
-    setSelectedMeetingKey(meetingKey);
-    setSelectedSessionKey("");
-    setSelectedDriver1("");
-    setSelectedDriver2("");
-    setActiveTab("overview");
+    setSelectedRaceKey(raceKey);
 
-    const nextParams = new URLSearchParams(searchParams);
+    const race = races.find((r) => r.race_key === raceKey);
 
-    nextParams.set("year", String(year));
-
-    if (meetingKey) {
-      nextParams.set("meeting_key", meetingKey);
-    } else {
-      nextParams.delete("meeting_key");
+    if (race && race.has_sessions) {
+      setSelectedSessionKey("");
+      setActiveTab("overview");
+    } else if (race) {
+      setSelectedSessionKey(raceKey);
+      setActiveTab("classification");
     }
 
-    nextParams.delete("session_key");
-    nextParams.set("tab", "overview");
+    setSelectedDriver1("");
+    setSelectedDriver2("");
+
+    const nextParams = new URLSearchParams(searchParams);
+    nextParams.set("year", String(year));
+
+    if (raceKey) {
+      nextParams.set("race_key", raceKey);
+    } else {
+      nextParams.delete("race_key");
+    }
+
+    if (race && race.has_sessions) {
+      nextParams.delete("session_key");
+    } else if (race) {
+      nextParams.set("session_key", raceKey);
+    }
+
+    nextParams.set("tab", race && !race.has_sessions ? "classification" : "overview");
 
     setSearchParams(nextParams);
   };
@@ -282,8 +282,8 @@ const selectedRound = useMemo(() => {
 
     nextParams.set("year", String(year));
 
-    if (selectedMeetingKey) {
-      nextParams.set("meeting_key", String(selectedMeetingKey));
+    if (selectedRaceKey) {
+      nextParams.set("race_key", String(selectedRaceKey));
     }
 
     if (sessionKey) {
@@ -353,8 +353,9 @@ const selectedRound = useMemo(() => {
           availableYears={availableYears}
           races={races}
           sessions={sessions}
-          selectedMeetingKey={selectedMeetingKey}
+          selectedRaceKey={selectedRaceKey}
           selectedSessionKey={selectedSessionKey}
+          selectedRaceHasSessions={selectedRace?.has_sessions ?? true}
           isRacesLoading={isRacesLoading}
           isSessionsLoading={isSessionsLoading}
           handleYearChange={handleYearChange}
@@ -374,11 +375,23 @@ const selectedRound = useMemo(() => {
           />
         )}
 
-        {selectedMeetingKey && isSessionsLoading && (
+        {selectedRaceKey && !selectedRace?.has_sessions && isSessionsLoading && (
+          <LoadingState message="Loading session data..." />
+        )}
+
+        {selectedRaceKey && !selectedRace?.has_sessions && isSessionsError && (
+          <ErrorState
+            message="Failed to load session data"
+            error={sessionsError}
+            onRetry={refetchSessions}
+          />
+        )}
+
+        {selectedRaceKey && selectedRace?.has_sessions && isSessionsLoading && (
           <LoadingState message="Loading sessions..." />
         )}
 
-        {selectedMeetingKey && isSessionsError && (
+        {selectedRaceKey && selectedRace?.has_sessions && isSessionsError && (
           <ErrorState
             message="Failed to load sessions"
             error={sessionsError}
@@ -386,7 +399,7 @@ const selectedRound = useMemo(() => {
           />
         )}
 
-        {!selectedSessionKey && <EmptyDashboardState />}
+        {!selectedSessionKey && !showHistoricalClassification && <EmptyDashboardState />}
 
         {selectedSessionKey && (
           <DashboardTabs activeTab={activeTab} onTabChange={handleTabChange} />
@@ -420,9 +433,9 @@ const selectedRound = useMemo(() => {
           </>
         )}
 
-        {selectedSessionKey && activeTab === "classification" && (
+        {(selectedSessionKey || showHistoricalClassification) && activeTab === "classification" && (
           <>
-            {isRaceSession && isRaceClassificationLoading && (
+            {(isRaceSession || showHistoricalClassification) && isRaceClassificationLoading && (
               <TableSkeleton
                 title="Loading race classification..."
                 rows={10}
@@ -430,7 +443,7 @@ const selectedRound = useMemo(() => {
               />
             )}
 
-            {isRaceSession && isRaceClassificationError && (
+            {(isRaceSession || showHistoricalClassification) && isRaceClassificationError && (
               <ErrorState
                 message="Failed to load race classification"
                 error={raceClassificationError}
@@ -441,7 +454,7 @@ const selectedRound = useMemo(() => {
             <RaceClassificationTable
               classificationData={raceClassificationData}
               selectedRound={selectedRound}
-              isRaceSession={isRaceSession}
+              isRaceSession={isRaceSession || showHistoricalClassification}
             />
           </>
         )}

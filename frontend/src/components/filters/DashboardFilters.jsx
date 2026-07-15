@@ -5,14 +5,17 @@ function DashboardFilters({
   availableYears,
   races,
   sessions,
-  selectedMeetingKey,
+  selectedRaceKey,
   selectedSessionKey,
+  selectedRaceHasSessions,
   isRacesLoading,
   isSessionsLoading,
   handleYearChange,
   handleRaceChange,
   handleSessionChange,
 }) {
+  const selectedRace = races.find((r) => r.race_key === selectedRaceKey);
+
   return (
     <Panel className="mb-4 p-4 sm:p-5">
       <div className="flex flex-col justify-between gap-4 lg:flex-row lg:items-center">
@@ -21,7 +24,9 @@ function DashboardFilters({
             Race Selection
           </p>
           <h2 className="mt-1 text-xl font-bold text-white">
-            Choose a session to analyze
+            {selectedRaceHasSessions
+              ? "Choose a session to analyze"
+              : "View race data"}
           </h2>
         </div>
 
@@ -50,7 +55,7 @@ function DashboardFilters({
             </label>
 
             <select
-              value={selectedMeetingKey}
+              value={selectedRaceKey}
               onChange={handleRaceChange}
               disabled={isRacesLoading || races.length === 0}
               className="w-full rounded-xl border border-slate-700 bg-slate-950 px-3 py-2.5 text-sm text-slate-100 outline-none transition disabled:cursor-not-allowed disabled:opacity-50 focus:border-red-500 focus:ring-2 focus:ring-red-950"
@@ -60,7 +65,7 @@ function DashboardFilters({
               </option>
 
               {races.map((race) => (
-                <option key={race.meeting_key} value={race.meeting_key}>
+                <option key={race.race_key} value={race.race_key}>
                   {race.meeting_name || `${race.location}, ${race.country_name}`}
                 </option>
               ))}
@@ -72,24 +77,32 @@ function DashboardFilters({
               Session
             </label>
 
-            <select
-              value={selectedSessionKey}
-              onChange={handleSessionChange}
-              disabled={
-                !selectedMeetingKey || isSessionsLoading || sessions.length === 0
-              }
-              className="w-full rounded-xl border border-slate-700 bg-slate-950 px-3 py-2.5 text-sm text-slate-100 outline-none transition disabled:cursor-not-allowed disabled:opacity-50 focus:border-red-500 focus:ring-2 focus:ring-red-950"
-            >
-              <option value="">
-                {isSessionsLoading ? "Loading sessions..." : "Select Session"}
-              </option>
-
-              {sessions.map((session) => (
-                <option key={session.session_key} value={session.session_key}>
-                  {session.session_name}
+            {selectedRaceHasSessions ? (
+              <select
+                value={selectedSessionKey}
+                onChange={handleSessionChange}
+                disabled={
+                  !selectedRaceKey || isSessionsLoading || sessions.length === 0
+                }
+                className="w-full rounded-xl border border-slate-700 bg-slate-950 px-3 py-2.5 text-sm text-slate-100 outline-none transition disabled:cursor-not-allowed disabled:opacity-50 focus:border-red-500 focus:ring-2 focus:ring-red-950"
+              >
+                <option value="">
+                  {isSessionsLoading ? "Loading sessions..." : "Select Session"}
                 </option>
-              ))}
-            </select>
+
+                {sessions.map((session) => (
+                  <option key={session.session_key} value={session.session_key}>
+                    {session.session_name}
+                  </option>
+                ))}
+              </select>
+            ) : (
+              <div className="flex items-center rounded-xl border border-slate-700 bg-slate-950/50 px-3 py-2.5 text-sm text-slate-500">
+                {selectedRace
+                  ? `${selectedRace.meeting_name || "Race"} — ${year}`
+                  : "Select a Grand Prix first"}
+              </div>
+            )}
           </div>
         </div>
       </div>

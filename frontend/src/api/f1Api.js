@@ -33,10 +33,12 @@ export const getRaces = async (year) => {
   return response.data;
 };
 
-export const getSessions = async (meetingKey) => {
-  const response = await axiosClient.get("/sessions", {
-    params: { meeting_key: meetingKey },
-  });
+export const getSessions = async (meetingKey, raceKey) => {
+  const params = {};
+  if (meetingKey) params.meeting_key = meetingKey;
+  else if (raceKey) params.race_key = raceKey;
+
+  const response = await axiosClient.get("/sessions", { params });
 
   return response.data;
 };

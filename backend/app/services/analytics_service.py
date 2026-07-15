@@ -415,3 +415,107 @@ async def get_bulk_analytics_data(session_key: int):
     await cache.set(cache_key, result, BULK_CACHE_TTL)
 
     return result
+
+
+def _parse_jolpica_session_key(session_key: str) -> tuple[int, int]:
+    parts = session_key.split("_")
+    return int(parts[1]), int(parts[2])
+
+
+async def get_bulk_analytics_data_with_fallback(session_key: int | str):
+    sk = str(session_key)
+    if sk.startswith("jolpica_"):
+        from app.services.jolpica_analytics_service import get_jolpica_bulk_analytics
+        year, round_number = _parse_jolpica_session_key(sk)
+        result = await get_jolpica_bulk_analytics(year, round_number)
+        result["session_key"] = sk
+        return result
+    return await get_bulk_analytics_data(session_key)
+
+
+async def get_jolpica_compare_drivers(
+    session_key: str,
+    driver1: int,
+    driver2: int,
+):
+    from app.services.jolpica_analytics_service import get_jolpica_bulk_analytics
+    from app.utils.stats_utils import calculate_driver_lap_stats
+
+    year, round_number = _parse_jolpica_session_key(session_key)
+    bulk = await get_jolpica_bulk_analytics(year, round_number)
+    laps = bulk.get("_all_laps", [])
+    drivers = bulk.get("drivers", {}).get("drivers", [])
+
+    driver_map = {d["driver_number"]: d for d in drivers if d["driver_number"]}
+
+    def _filter_laps(driver_number: int):
+        return [
+            {
+                "lap_number": l["lap_number"],
+                "lap_duration": l["lap_duration"],
+                "lap_time_formatted": l["lap_time_formatted"],
+            }
+            for l in laps
+            if l["driver_number"] == driver_number and l["lap_duration"] is not None
+        ]
+
+    d1_laps = _filter_laps(driver1)
+    d2_laps = _filter_laps(driver2)
+
+    d1_stats = calculate_driver_lap_stats(d1_laps) if d1_laps else {}
+    d2_stats = calculate_driver_lap_stats(d2_laps) if d2_laps else {}
+
+    d1_map = {l["lap_number"]: l for l in d1_laps}
+    d2_map = {l["lap_number"]: l for l in d2_laps}
+    common = sorted(set(d1_map.keys()) & set(d2_map.keys()))
+
+    lap_by_lap = []
+    for ln in common:
+        d1t = d1_map[ln]["lap_duration"]
+        d2t = d2_map[ln]["lap_duration"]
+        diff = round(d1t - d2t, 3)
+        lap_by_lap.append({
+            "lap_number": ln,
+            "driver1_lap_duration": d1t,
+            "driver1_lap_time_formatted": format_lap_time(d1t),
+            "driver2_lap_duration": d2t,
+            "driver2_lap_time_formatted": format_lap_time(d2t),
+            "difference": diff,
+            "faster_driver": driver1 if diff < 0 else driver2 if diff > 0 else "equal",
+        })
+
+    diff_fastest = None
+    diff_avg = None
+    diff_median = None
+    if d1_stats.get("fastest_lap") and d2_stats.get("fastest_lap"):
+        diff_fastest = round(
+            d1_stats["fastest_lap"]["lap_duration"]
+            - d2_stats["fastest_lap"]["lap_duration"], 3
+        )
+    if d1_stats.get("average_lap") is not None and d2_stats.get("average_lap") is not None:
+        diff_avg = round(d1_stats["average_lap"] - d2_stats["average_lap"], 3)
+    if d1_stats.get("median_lap") is not None and d2_stats.get("median_lap") is not None:
+        diff_median = round(d1_stats["median_lap"] - d2_stats["median_lap"], 3)
+
+    return {
+        "session_key": session_key,
+        "drivers": {
+            "driver1": driver_map.get(driver1, {"driver_number": driver1}),
+            "driver2": driver_map.get(driver2, {"driver_number": driver2}),
+        },
+        "stats": {"driver1": d1_stats, "driver2": d2_stats},
+        "differences": {
+            "fastest_lap_difference": diff_fastest,
+            "average_lap_difference": diff_avg,
+            "median_lap_difference": diff_median,
+            "note": "Negative value means driver1 was faster. Positive value means driver2 was faster.",
+        },
+        "data_quality": {
+            "is_complete": bool(d1_laps and d2_laps),
+            "driver1_valid_laps": len(d1_laps),
+            "driver2_valid_laps": len(d2_laps),
+            "message": "Comparison data loaded successfully." if (d1_laps and d2_laps)
+            else "One or both drivers have no valid lap data available.",
+        },
+        "lap_by_lap_comparison": lap_by_lap,
+    }
