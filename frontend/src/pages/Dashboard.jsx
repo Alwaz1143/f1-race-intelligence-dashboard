@@ -109,6 +109,8 @@ function Dashboard() {
     refetch: refetchRaces,
   } = useRaces(year);
 
+  const races = racesData?.races || [];
+
   const selectedRace = races.find(
     (race) => race.race_key === selectedRaceKey
   );
@@ -177,8 +179,6 @@ function Dashboard() {
   const drivers = driversData?.drivers || [];
 
   const fastestLaps = fastestLapsData?.leaderboard || [];
-
-  const races = racesData?.races || [];
 
 
   const sessions = sessionsData?.sessions || [];
