@@ -29,27 +29,27 @@ STALE_AFTER_SECONDS = 1800
 CACHE_TTL_SECONDS = 3600
 
 
-async def _call_grok(prompt: str) -> tuple[str, str]:
-    """Call Grok via xAI API (Chat Completions)."""
-    if not settings.XAI_API_KEY:
+async def _call_groq(prompt: str) -> tuple[str, str]:
+    """Call Groq LPU (fast, free inference)."""
+    if not settings.GROQ_API_KEY:
         raise HTTPException(
             status_code=503,
-            detail="xAI API key is not configured.",
+            detail="Groq API key is not configured.",
         )
 
     client = AsyncOpenAI(
-        api_key=settings.XAI_API_KEY,
-        base_url="https://api.x.ai/v1",
+        api_key=settings.GROQ_API_KEY,
+        base_url="https://api.groq.com/openai/v1",
     )
 
     for attempt in range(3):
         try:
             response = await client.chat.completions.create(
-                model=settings.GROK_MODEL,
+                model=settings.GROQ_MODEL,
                 messages=[{"role": "user", "content": prompt}],
             )
             text = response.choices[0].message.content or "AI summary could not be generated."
-            return text, settings.GROK_MODEL
+            return text, f"groq/{settings.GROQ_MODEL}"
         except Exception as e:
             error_str = str(e).lower()
             is_retryable = any(
@@ -61,12 +61,12 @@ async def _call_grok(prompt: str) -> tuple[str, str]:
             if is_retryable and attempt < 2:
                 await asyncio.sleep(1.5 * (attempt + 1))
                 continue
-            logger.warning("Grok attempt %d failed: %s", attempt + 1, e)
+            logger.warning("Groq attempt %d failed: %s", attempt + 1, e)
             break
 
     raise HTTPException(
         status_code=503,
-        detail="Grok API unavailable.",
+        detail="Groq API unavailable.",
     )
 
 
@@ -111,12 +111,12 @@ async def _call_gemini_with_fallback(prompt: str) -> tuple[str, str]:
 
 
 async def _call_ai_with_fallback(prompt: str) -> tuple[str, str]:
-    """Try Grok first (faster/cheaper), fall back to Gemini."""
-    if settings.XAI_API_KEY:
+    """Try Groq first (fast, free), fall back to Gemini."""
+    if settings.GROQ_API_KEY:
         try:
-            return await _call_grok(prompt)
+            return await _call_groq(prompt)
         except HTTPException as e:
-            logger.warning("Grok failed, falling back to Gemini: %s", e.detail)
+            logger.warning("Groq failed, falling back to Gemini: %s", e.detail)
 
     return await _call_gemini_with_fallback(prompt)
 
@@ -191,10 +191,10 @@ async def _build_compact_payload(session_key: int) -> dict:
 async def generate_ai_session_summary(session_key: int):
     cache_key = f"ai_summary:v4:session:{session_key}"
 
-    if not settings.GEMINI_API_KEY and not settings.XAI_API_KEY:
+    if not settings.GEMINI_API_KEY and not settings.GROQ_API_KEY:
         raise HTTPException(
             status_code=503,
-            detail="No AI provider API key configured. Set XAI_API_KEY or GEMINI_API_KEY.",
+            detail="No AI provider API key configured. Set GROQ_API_KEY or GEMINI_API_KEY.",
         )
 
     cached_summary = await cache.get(cache_key)

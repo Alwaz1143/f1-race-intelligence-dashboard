@@ -25,8 +25,8 @@ class Settings:
         os.getenv("GEMINI_FALLBACK_MODEL", "gemini-3.1-flash-lite"),
     ]
 
-    XAI_API_KEY: str | None = os.getenv("XAI_API_KEY")
-    GROK_MODEL: str = os.getenv("GROK_MODEL", "grok-4.5")
+    GROQ_API_KEY: str | None = os.getenv("GROQ_API_KEY")
+    GROQ_MODEL: str = os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile")
     
     @property
     def allowed_origins(self) -> list[str]:
