@@ -330,23 +330,23 @@ const selectedRound = useMemo(() => {
               </p>
             </div>
 
-            <div className="card-gradient rounded-lg border px-5 py-3 text-sm font-medium whitespace-nowrap">
+            <div className="card-gradient rounded-lg border px-5 py-3 text-sm font-medium">
               {isHealthLoading && (
                 <span className="text-slate-400 animate-pulse">Checking API...</span>
               )}
 
               {!isHealthLoading && !isHealthError && (
-                <div className="flex items-center gap-2">
-                  <span className="inline-block h-2 w-2 rounded-full bg-green-500 animate-pulse-glow" />
+                <div className="flex items-center gap-2 whitespace-nowrap">
+                  <span className="inline-block h-2 w-2 rounded-full bg-green-500 animate-pulse-glow flex-shrink-0" />
                   <span className="text-green-400">
-                    {healthData?.status}
+                    {healthData?.status || "API Status: Healthy"}
                   </span>
                 </div>
               )}
 
               {isHealthError && (
-                <div className="flex items-center gap-2">
-                  <span className="inline-block h-2 w-2 rounded-full bg-red-500 animate-pulse-glow" />
+                <div className="flex items-center gap-2 whitespace-nowrap">
+                  <span className="inline-block h-2 w-2 rounded-full bg-red-500 animate-pulse-glow flex-shrink-0" />
                   <span className="text-red-400">API Offline</span>
                 </div>
               )}
